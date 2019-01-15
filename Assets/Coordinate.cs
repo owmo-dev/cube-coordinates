@@ -21,5 +21,6 @@ public class Coordinate : MonoBehaviour
     {
         this._cube = cube;
         this._position = position;
+        gameObject.transform.position = _position;
     }
 }

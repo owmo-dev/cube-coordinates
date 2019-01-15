@@ -8,18 +8,18 @@ public class CubeCoordinates : MonoBehaviour
 
     private GameObject _group;
 
+    [SerializeField]
+    private int _radius = 10;
+
     private float _gameScale = 1.0f;
     private float _coordinateRadius = 1.0f;
 
     private float _coordinateWidth = 0.0f;
     private float _coordinateHeight = 0.0f;
-    private float _coordinateDepth = 0.0f;
 
     private float _spacingVertical = 0.0f;
     private float _spacingHorizontal = 0.0f;
-    private float _spacingDepth = 0.0f;
 
-    public float spacingDepth { get { return _spacingDepth; } }
     public float coordinateRadius { get { return _coordinateRadius; } }
 
     private Vector3[] _cubeDirections =
@@ -47,7 +47,12 @@ public class CubeCoordinates : MonoBehaviour
         CalculateCoordinateDimensions();
     }
 
-    // Coordinate Conversions
+    private void Start()
+    {
+        New(_radius);
+    }
+
+    // Construction
 
     public void CalculateCoordinateDimensions()
     {
@@ -58,10 +63,66 @@ public class CubeCoordinates : MonoBehaviour
 
         _coordinateHeight = (Mathf.Sqrt(3) / 2.0f) * _coordinateWidth;
         _spacingVertical = _coordinateHeight / 2.0f;
-
-        _coordinateDepth = _coordinateRadius;
-        _spacingDepth = _coordinateDepth * 0.5f;
     }
+
+    public void New(int radius)
+    {
+        Clear();
+        _group = new GameObject("CubeCoordinates");
+
+        for (int x = -radius; x <= radius; x++)
+            for (int y = -radius; y <= radius; y++)
+                for (int z = -radius; z <= radius; z++)
+                    if ((x + y + z) == 0)
+                        AddCube(new Vector3(x, y, z));
+    }
+
+    private void Clear()
+    {
+        Destroy(_group);
+        ClearAllCoordinateContainers();
+    }
+
+    public void AddCube(Vector3 cube)
+    {
+        if (GetCoordinateFromContainer(cube, "all") != null)
+            return;
+
+        GameObject obj = new GameObject("Coordinate: [" + cube.x + "," + cube.y + "," + cube.z + "]");
+        obj.transform.parent = _group.transform;
+
+        Coordinate coordinate = obj.AddComponent<Coordinate>();
+        coordinate.Init(
+            cube,
+            ConvertCubeToWorldPosition(cube)
+        );
+
+        AddCoordinateToContainer(coordinate, "all");
+    }
+
+    public void AddCubes(List<Vector3> cubes)
+    {
+        foreach (Vector3 cube in cubes)
+            AddCube(cube);
+    }
+
+    public void RemoveCube(Vector3 cube)
+    {
+        Coordinate coordinate = GetCoordinateFromContainer(cube, "all");
+        if (coordinate == null)
+            return;
+
+        RemoveCoordinateFromAllContainers(cube);
+        Destroy(coordinate.gameObject);
+    }
+
+    public void RemoveCubes(List<Vector3> cubes)
+    {
+        foreach (Vector3 cube in cubes)
+            RemoveCube(cube);
+    }
+
+    // Coordinate Conversions
 
     public Vector2 ConvertCubetoAxial(Vector3 cube)
     {
@@ -619,84 +680,5 @@ public class CubeCoordinates : MonoBehaviour
     }
      */
 
-    // Building
 
-    public void New(int radius)
-    {
-        Clear();
-        _group = new GameObject("(Group) Coordinates");
-
-        for (int x = -radius; x <= radius; x++)
-            for (int y = -radius; y <= radius; y++)
-                for (int z = -radius; z <= radius; z++)
-                    if ((x + y + z) == 0)
-                        AddCube(new Vector3(x, y, z));
-    }
-
-    /*
-    public void New(List<Coordinate.Info> coordinateInfos)
-    {
-        Clear();
-        _group = new GameObject("(Group) Coordinates");
-
-        foreach (Coordinate.Info coordinateInfo in coordinateInfos)
-        {
-            AddCube(
-                new Vector3(coordinateInfo.x, coordinateInfo.y, coordinateInfo.z),
-                coordinateInfo.w,
-                (Coordinate.Type)Enum.Parse(typeof(Coordinate.Type), coordinateInfo.type)
-            );
-        }
-    }
-     */
-
-    private void Clear()
-    {
-        Destroy(_group);
-        ClearAllCoordinateContainers();
-    }
-
-    public void AddCube(Vector3 cube)
-    {
-        AddCube(cube, 0.0f);
-    }
-
-    public void AddCube(Vector3 cube, float w)
-    {
-        if (GetCoordinateFromContainer(cube, "all") != null)
-            return;
-
-        GameObject obj = new GameObject("(BASE) [" + cube.x + "," + cube.y + "," + cube.z + "]");
-        obj.transform.parent = _group.transform;
-
-        Coordinate coordinate = obj.AddComponent<Coordinate>();
-        coordinate.Init(
-            cube,
-            ConvertCubeToWorldPosition(cube)
-        );
-
-        AddCoordinateToContainer(coordinate, "all");
-    }
-
-    public void AddCubes(List<Vector3> cubes)
-    {
-        foreach (Vector3 cube in cubes)
-            AddCube(cube);
-    }
-
-    public void RemoveCube(Vector3 cube)
-    {
-        Coordinate coordinate = GetCoordinateFromContainer(cube, "all");
-        if (coordinate == null)
-            return;
-
-        RemoveCoordinateFromAllContainers(cube);
-        Destroy(coordinate.gameObject);
-    }
-
-    public void RemoveCubes(List<Vector3> cubes)
-    {
-        foreach (Vector3 cube in cubes)
-            RemoveCube(cube);
-    }
 }
