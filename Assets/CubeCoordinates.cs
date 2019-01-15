@@ -2,52 +2,8 @@
 using System;
 using System.Collections.Generic;
 
-public class CubeCoordinateSingleton : MonoBehaviour
+public class CubeCoordinates : MonoBehaviour
 {
-    private static CubeCoordinateSingleton _instance;
-    private static readonly object Lock = new object();
-
-    public static bool Quitting { get; private set; }
-
-    public static CubeCoordinateSingleton Instance
-    {
-        get
-        {
-            if (Quitting)
-            {
-                Debug.LogWarning(typeof(CubeCoordinateSingleton).ToString() + ", Instance will not be returned, Application is Quitting.");
-                return null;
-            }
-
-            lock (Lock)
-            {
-                if (_instance != null)
-                    return _instance;
-
-                var objs = FindObjectsOfType<CubeCoordinateSingleton>();
-                if (objs.Length > 0)
-                {
-                    if (objs.Length == 1)
-                        return _instance = objs[0];
-
-                    Debug.LogWarning(typeof(CubeCoordinateSingleton).ToString() + ", More than 1 Singleton! First intance used, all others destroyed.");
-
-                    for (var i = 1; i < objs.Length; i++)
-                        Destroy(objs[i]);
-                    return _instance = objs[0];
-                }
-                GameObject obj = new GameObject(typeof(CubeCoordinateSingleton).ToString());
-                DontDestroyOnLoad(obj);
-                return _instance = obj.AddComponent<CubeCoordinateSingleton>();
-            }
-        }
-    }
-
-    private void OnApplicationQuit()
-    {
-        Quitting = true;
-    }
-
     private Dictionary<string, Dictionary<Vector3, Coordinate>> _coordinateContainers = new Dictionary<string, Dictionary<Vector3, Coordinate>>();
 
     private GameObject _group;
