@@ -1,6 +1,5 @@
 # unity-hexagonal-grids
-Unity C# classes for constructing and using hexagonal grid coordinate systems.
 
-A collection of hexagonal grid coordinate system functionality developed based on the following guide:
+Collection of cube coordinate fucntionality for hexagonal grid construction and interaction. Following this guide:
 
 https://www.redblobgames.com/grids/hexagons/
