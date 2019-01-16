@@ -42,8 +42,7 @@ public class CubeCoordinates : MonoBehaviour
         CalculateCoordinateDimensions();
     }
 
-    // Construction
-
+    // Uses gamescale to calculate spacings & dimensions
     public void CalculateCoordinateDimensions()
     {
         _coordinateRadius = _coordinateRadius * _gameScale;
@@ -57,7 +56,8 @@ public class CubeCoordinates : MonoBehaviour
         HexMeshCreator.Instance.SetRadius(_coordinateRadius);
     }
 
-    public void New(int radius)
+    // Constructs new set of coordinates from 0,0,0 given a radius
+    public void Construct(int radius)
     {
         Clear();
         _group = new GameObject("CubeCoordinates");
@@ -69,12 +69,14 @@ public class CubeCoordinates : MonoBehaviour
                         AddCube(new Vector3(x, y, z));
     }
 
+    // Destroys all coordinates and entries
     private void Clear()
     {
         Destroy(_group);
         ClearAllCoordinateContainers();
     }
 
+    // Creates a Coordinate GameObject for a given cube coordinate
     public void AddCube(Vector3 cube)
     {
         if (GetCoordinateFromContainer(cube, "all") != null)
@@ -92,12 +94,14 @@ public class CubeCoordinates : MonoBehaviour
         AddCoordinateToContainer(coordinate, "all");
     }
 
+    // Creates a set of Coordinate GameObjects for a given list of cube coordinates
     public void AddCubes(List<Vector3> cubes)
     {
         foreach (Vector3 cube in cubes)
             AddCube(cube);
     }
 
+    // Removes and destroys a Coordinate for a given cube coordinate
     public void RemoveCube(Vector3 cube)
     {
         Coordinate coordinate = GetCoordinateFromContainer(cube, "all");
@@ -108,24 +112,26 @@ public class CubeCoordinates : MonoBehaviour
         Destroy(coordinate.gameObject);
     }
 
+    // Removes and destroys a set of Coordinates for a given list of cube coordinates
     public void RemoveCubes(List<Vector3> cubes)
     {
         foreach (Vector3 cube in cubes)
             RemoveCube(cube);
     }
 
-    // Coordinate Conversions
-
+    // Converts a cube coordinate to an axial coordinate
     public Vector2 ConvertCubetoAxial(Vector3 cube)
     {
         return new Vector2(cube.x, cube.z);
     }
 
+    // Converts an axial coordinate to a cube coordinate
     public Vector3 ConvertAxialtoCube(Vector2 axial)
     {
         return new Vector3(axial.x, (-axial.x - axial.y), axial.y);
     }
 
+    // Converts an axial coordinate to a world transform position
     public Vector3 ConvertAxialToWorldPosition(Vector2 axial)
     {
         float x = axial.x * _spacingHorizontal;
@@ -134,6 +140,7 @@ public class CubeCoordinates : MonoBehaviour
         return new Vector3(x, 0.0f, z);
     }
 
+    // Converts a cube coordinate to a world transform position
     public Vector3 ConvertCubeToWorldPosition(Vector3 cube)
     {
         float x = cube.x * _spacingHorizontal;
@@ -143,6 +150,7 @@ public class CubeCoordinates : MonoBehaviour
         return new Vector3(x, y, z);
     }
 
+    // Converts a world transform position to the nearest axial coordinate
     public Vector2 ConvertWorldPositionToAxial(Vector3 wPos)
     {
         float q = (wPos.x * (2.0f / 3.0f)) / _coordinateRadius;
@@ -150,16 +158,19 @@ public class CubeCoordinates : MonoBehaviour
         return RoundAxial(new Vector2(q, r));
     }
 
+    // Converts a world transform position to the nearest cube coordinate
     public Vector3 ConvertWorldPositionToCube(Vector3 wPos)
     {
         return ConvertAxialtoCube(ConvertWorldPositionToAxial(wPos));
     }
 
+    // Rounds a given Vector2 to the nearest axial coordinate
     public Vector2 RoundAxial(Vector2 axial)
     {
         return RoundCube(ConvertAxialtoCube(axial));
     }
 
+    // Rounds a given Vector3 to the nearest cube coordinate
     public Vector3 RoundCube(Vector3 coord)
     {
         float rx = Mathf.Round(coord.x);
@@ -180,35 +191,37 @@ public class CubeCoordinates : MonoBehaviour
         return new Vector3(rx, ry, rz);
     }
 
-    // Directions
-
+    // Return a cube vector for a given direction index
     public Vector3 GetCubeDirection(int direction)
     {
         return _cubeDirections[direction];
     }
 
+    // Returns an cube diagonal vector for a given direction index
     public Vector3 GetCubeDiagonalDirection(int direction)
     {
         return _cubeDiagonalDirections[direction];
     }
 
-    // Neighbors
-
+    // Returns the neighboring cube coordinate for a given direction index at a coordinate distance of 1
     public Vector3 GetNeighborCube(Vector3 cube, int direction)
     {
         return GetNeighborCube(cube, direction, 1);
     }
 
+    // Returns the neighboring cube coordinate for a given direction index at a given coordinate distance
     public Vector3 GetNeighborCube(Vector3 cube, int direction, int distance)
     {
         return cube + (GetCubeDirection(direction) * (float)distance);
     }
 
+    // Returns all neighboring cube coordinates at a coordinate distance of 1
     public List<Vector3> GetNeighborCubes(Vector3 cube)
     {
         return GetNeighborCubes(cube, 1);
     }
 
+    // Returns all neighboring cube coordinates inclusively up to a given coordinate distance
     public List<Vector3> GetNeighborCubes(Vector3 cube, int radius, bool cleanResults = true)
     {
         List<Vector3> cubes = new List<Vector3>();
@@ -226,23 +239,25 @@ public class CubeCoordinates : MonoBehaviour
         return cubes;
     }
 
-    // Diagonals
-
+    // Returns a neighboring diagonal cube coordinate for a given direction index at a coordinate distance of 1
     public Vector3 GetDiagonalNeighborCube(Vector3 cube, int direction)
     {
         return cube + GetCubeDiagonalDirection(direction);
     }
 
+    // Returns a neighboring diagonal cube coordinate for a given direction index at a given coordinate distance
     public Vector3 GetDiagonalNeighborCube(Vector3 cube, int direction, int distance)
     {
         return cube + (GetCubeDiagonalDirection(direction) * (float)distance);
     }
 
+    // Returns all neighboring diagonal cube coordinates at a coordinate distance of 1
     public List<Vector3> GetDiagonalNeighborCubes(Vector3 cube)
     {
         return GetDiagonalNeighborCubes(cube, 1);
     }
 
+    // Returns all neighboring diagonal cube coordinates at a given coordinate distance
     public List<Vector3> GetDiagonalNeighborCubes(Vector3 cube, int distance, bool cleanResults = true)
     {
         List<Vector3> cubes = new List<Vector3>();
@@ -253,8 +268,7 @@ public class CubeCoordinates : MonoBehaviour
         return cubes;
     }
 
-    // Boolean Operations
-
+    // Boolean combines two lists of cube coordinates
     public List<Vector3> BooleanCombineCubes(List<Vector3> a, List<Vector3> b)
     {
         List<Vector3> vec = a;
@@ -264,6 +278,7 @@ public class CubeCoordinates : MonoBehaviour
         return vec;
     }
 
+    // Boolean differences two lists of cube coordinates
     public List<Vector3> BooleanDifferenceCubes(List<Vector3> a, List<Vector3> b)
     {
         List<Vector3> vec = a;
@@ -273,6 +288,7 @@ public class CubeCoordinates : MonoBehaviour
         return vec;
     }
 
+    // Boolean intersects two lists of cube coordinates
     public List<Vector3> BooleanIntersectionCubes(List<Vector3> a, List<Vector3> b)
     {
         List<Vector3> vec = new List<Vector3>();
@@ -283,6 +299,7 @@ public class CubeCoordinates : MonoBehaviour
         return vec;
     }
 
+    // Boolean excludes two lists of cube coordinates
     public List<Vector3> BooleanExclusionCubes(List<Vector3> a, List<Vector3> b)
     {
         List<Vector3> vec = new List<Vector3>();
@@ -296,25 +313,25 @@ public class CubeCoordinates : MonoBehaviour
         return vec;
     }
 
-    // Rotations
-
+    // Rotates a cube coordinate right by one coordinate
     public Vector4 RotateCubeCoordinatesRight(Vector3 cube)
     {
         return new Vector3(-cube.z, -cube.x, -cube.y);
     }
 
+    // Rotates a cube coordinate left by one coordinate
     public Vector4 RotateCubeCoordinatesLeft(Vector3 cube)
     {
         return new Vector3(-cube.y, -cube.z, -cube.x);
     }
 
-    // Special
-
+    // Calculates the distance between two cube coordinates
     public float GetDistanceBetweenTwoCubes(Vector3 a, Vector3 b)
     {
         return Mathf.Max(Mathf.Abs(a.x - b.x), Mathf.Abs(a.y - b.y), Mathf.Abs(a.z - b.z));
     }
 
+    // Calculates the lerp interpolation between two cube coordinates given a value between 0.0f and 1.0f
     public Vector3 GetLerpBetweenTwoCubes(Vector3 a, Vector3 b, float t)
     {
         Vector3 cube = new Vector3(
@@ -326,12 +343,14 @@ public class CubeCoordinates : MonoBehaviour
         return cube;
     }
 
+    // Returns the cube coordinate a given distance interval between two cube coordinates
     public Vector3 GetPointOnLineBetweenTwoCubes(Vector3 a, Vector3 b, int distance)
     {
         float cubeDistance = GetDistanceBetweenTwoCubes(a, b);
         return RoundCube(GetLerpBetweenTwoCubes(a, b, ((1.0f / cubeDistance) * distance)));
     }
 
+    // Returns a list representing the line of cube coordinates between two given cube coordinates (inclusive)
     public List<Vector3> GetLineBetweenTwoCubes(Vector3 a, Vector3 b, bool cleanResults = true)
     {
         List<Vector3> cubes = new List<Vector3>();
@@ -344,33 +363,7 @@ public class CubeCoordinates : MonoBehaviour
         return cubes;
     }
 
-    public List<Vector3> GetLineOfSightBetweenTwoCubes(Vector3 a, Vector3 b, bool cleanResults = true)
-    {
-        List<Vector3> cubes = new List<Vector3>();
-        List<Vector3> line = GetLineBetweenTwoCubes(a, b);
-        line.Remove(a);
-
-        Coordinate coordinate = GetCoordinateFromContainer(a, "all");
-
-        foreach (Vector3 v in line)
-        {
-            coordinate = GetCoordinateFromContainer(v, "all");
-            cubes.Add(v);
-        }
-
-        cubes.Add(a);
-        if (cleanResults)
-            return CleanCubeResults(cubes);
-        return cubes;
-    }
-
-    // Reachable
-
-    public List<Vector3> GetReachableCubes(Vector3 cube)
-    {
-        return new List<Vector3>();
-    }
-
+    // Returns a list of validated neighboring cube coordinates at a evaluation distance of 1
     public List<Vector3> GetReachableCubes(Vector3 cube, bool cleanResults = true)
     {
         List<Vector3> cubes = new List<Vector3>();
@@ -383,7 +376,9 @@ public class CubeCoordinates : MonoBehaviour
         {
             currentCube = GetNeighborCube(cube, i);
             currentCoordinate = GetCoordinateFromContainer(currentCube, "all");
-            cubes.Add(currentCube);
+
+            if (currentCoordinate != null)
+                cubes.Add(currentCube);
         }
 
         if (cleanResults)
@@ -391,6 +386,7 @@ public class CubeCoordinates : MonoBehaviour
         return cubes;
     }
 
+    // Returns a list of validated neighboring cube coordinates at a given evaluation radius
     public List<Vector3> GetReachableCubes(Vector3 cube, int radius, bool cleanResults = true)
     {
         if (radius == 1)
@@ -424,6 +420,7 @@ public class CubeCoordinates : MonoBehaviour
         return visited;
     }
 
+    // Returns an ordered list of cube coordinates following a spiral pattern around a given cube coordinate at a given coordinate distance
     public List<Vector3> GetSpiralCubes(Vector3 cube, int radius, bool cleanResutls = true)
     {
         List<Vector3> vec = new List<Vector3>();
@@ -440,6 +437,7 @@ public class CubeCoordinates : MonoBehaviour
         return vec;
     }
 
+    // Returns an ordered list of cube coordinates following a spiral pattern around a given cube coordinate up to a given coordinate distance (inclusive)
     public List<Vector3> GetMultiSpiralCubes(Vector3 cube, int radius)
     {
         List<Vector3> cubes = new List<Vector3>();
@@ -450,8 +448,7 @@ public class CubeCoordinates : MonoBehaviour
         return cubes;
     }
 
-    // PathFinding
-
+    // Returns an ordered list of cube coordinates following the A* path results between two given cube coordinates
     public List<Vector3> GetPathBetweenTwoCubes(Vector3 origin, Vector3 target, string container)
     {
         if (origin == target)
@@ -531,8 +528,7 @@ public class CubeCoordinates : MonoBehaviour
         return path;
     }
 
-    // Extras
-
+    // Validates all cube coordinate results against instantiated Coordinate GameObjects
     public List<Vector3> CleanCubeResults(List<Vector3> cubes)
     {
         List<Vector3> r = new List<Vector3>();
@@ -542,8 +538,7 @@ public class CubeCoordinates : MonoBehaviour
         return r;
     }
 
-    // Containers
-
+    // Returns a coordinate container given a container key
     private Dictionary<Vector3, Coordinate> GetCoordinateContainer(string key)
     {
         Dictionary<Vector3, Coordinate> coordinateContainer;
@@ -555,6 +550,7 @@ public class CubeCoordinates : MonoBehaviour
         return coordinateContainer;
     }
 
+    // Removes empty coordinate containers
     private void CleanEmptyCoordinateContainers()
     {
         List<string> coordinateContainerKeysToRemove = new List<string>();
@@ -570,6 +566,7 @@ public class CubeCoordinates : MonoBehaviour
             _coordinateContainers.Remove(key);
     }
 
+    // Returns a Coordinate given a cube coordinate and a container key
     public Coordinate GetCoordinateFromContainer(Vector3 cube, string key)
     {
         Coordinate coordinate = null;
@@ -581,6 +578,7 @@ public class CubeCoordinates : MonoBehaviour
         return coordinate;
     }
 
+    // Returns a list of Coordinates given a container key
     public List<Coordinate> GetCoordinatesFromContainer(string key)
     {
         List<Coordinate> coordinates = new List<Coordinate>();
@@ -590,6 +588,7 @@ public class CubeCoordinates : MonoBehaviour
         return coordinates;
     }
 
+    // Returns a list of cube coordinates given a container key
     public List<Vector3> GetCubesFromContainer(string key)
     {
         List<Vector3> cubes = new List<Vector3>();
@@ -599,6 +598,7 @@ public class CubeCoordinates : MonoBehaviour
         return cubes;
     }
 
+    // Adds a given Coordinate to the given container key
     public bool AddCoordinateToContainer(Coordinate coordinate, string key)
     {
         Dictionary<Vector3, Coordinate> coordinateContainer = GetCoordinateContainer(key);
@@ -610,6 +610,7 @@ public class CubeCoordinates : MonoBehaviour
         return false;
     }
 
+    // Removes a given Coordinate from the given container key
     public void RemoveCoordinateFromContainer(Coordinate coordinate, string key)
     {
         Dictionary<Vector3, Coordinate> coordinateContainer = GetCoordinateContainer(key);
@@ -617,29 +618,34 @@ public class CubeCoordinates : MonoBehaviour
             coordinateContainer.Remove(coordinate.cube);
     }
 
+    // Removes all Coordinates from given container key
     public void RemoveAllCoordinatesInContainer(string key)
     {
         Dictionary<Vector3, Coordinate> coordinateContainer = GetCoordinateContainer(key);
         coordinateContainer.Clear();
     }
 
+    // Removes a given Coordinate from all containers
     public void RemoveCoordinateFromAllContainers(Coordinate coordinate)
     {
         foreach (string key in _coordinateContainers.Keys)
             RemoveCoordinateFromContainer(coordinate, key);
     }
 
+    // Clears all coordinate containers
     public void ClearAllCoordinateContainers()
     {
         _coordinateContainers.Clear();
     }
 
+    // Clears all Coordinates from a given container key
     public void ClearCoordinatesFromContainer(string key)
     {
         Dictionary<Vector3, Coordinate> coordinateContainer = GetCoordinateContainer(key);
         coordinateContainer.Clear();
     }
 
+    // Hides all Coordinates for a given container key
     public void HideCoordinatesInContainer(string key)
     {
         foreach (Coordinate coordinate in GetCoordinatesFromContainer(key))
@@ -649,6 +655,7 @@ public class CubeCoordinates : MonoBehaviour
         }
     }
 
+    // Shows all Coordinates for a given container key
     public void ShowCoordinatesInContainer(string key, bool bCollider = true)
     {
         foreach (Coordinate coordinate in GetCoordinatesFromContainer(key))
@@ -658,6 +665,7 @@ public class CubeCoordinates : MonoBehaviour
         }
     }
 
+    // Hides and Clears all Coordinates for a given container key
     public void HideAndClearCoordinateContainer(string key)
     {
         foreach (Coordinate coordinate in GetCoordinatesFromContainer(key))

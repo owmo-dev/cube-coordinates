@@ -21,6 +21,7 @@ public class Coordinate : MonoBehaviour
         get { return gCost + hCost; }
     }
 
+    // Initializes the Coordinate given a cube coordinate and world transform position
     public void Init(Vector3 cube, Vector3 position)
     {
         this._cube = cube;
@@ -41,12 +42,14 @@ public class Coordinate : MonoBehaviour
         Hide();
     }
 
+    // Hides the Coordinate
     public void Hide()
     {
         _meshRenderer.enabled = false;
         _meshCollider.enabled = false;
     }
 
+    // Shows the Coordinate
     public void Show(bool bCollider = true)
     {
         _meshRenderer.enabled = true;

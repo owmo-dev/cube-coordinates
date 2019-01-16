@@ -57,17 +57,15 @@ public class HexMeshCreator : MonoBehaviour
     private float _upOffset = 0.01f;
     private float _innerRadius = 0.9f;
 
-    private void Awake()
+    // Sets the radius and constructs the geometry meshes
+    public void SetRadius(float radius)
     {
+        _radius = radius;
         _mesh = BuildMesh();
         _outlineMesh = BuildOutlineMesh(_upOffset, _innerRadius);
     }
 
-    public void SetRadius(float radius)
-    {
-        _radius = radius;
-    }
-
+    // Returns a vertex given an index
     private Vector3 GetVertex(int i)
     {
         float angle_deg = 60.0f * (float)i;
@@ -78,6 +76,7 @@ public class HexMeshCreator : MonoBehaviour
         );
     }
 
+    // Builds the tile mesh
     private Mesh BuildMesh()
     {
         Mesh mesh = new Mesh();
@@ -115,6 +114,7 @@ public class HexMeshCreator : MonoBehaviour
         return mesh;
     }
 
+    // Builds the outline mesh
     private Mesh BuildOutlineMesh(float upOffset, float innerRadius)
     {
         Mesh mesh = new Mesh();
@@ -202,11 +202,13 @@ public class HexMeshCreator : MonoBehaviour
         return mesh;
     }
 
+    // Adds the specified mesh to a given GameObject, does not add a MeshCollider
     public void AddToGameObject(GameObject go, Type type)
     {
         AddToGameObject(go, type, false);
     }
 
+    // Adds the specified mesh to a given GameObject and can add a MeshCollider
     public void AddToGameObject(GameObject go, Type type, bool addMeshCollider)
     {
         if (go == null)
