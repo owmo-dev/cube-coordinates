@@ -8,9 +8,6 @@ public class CubeCoordinates : MonoBehaviour
 
     private GameObject _group;
 
-    [SerializeField]
-    private int _tileRadius = 10;
-
     private float _gameScale = 1.0f;
     private float _coordinateRadius = 1.0f;
 
@@ -19,8 +16,6 @@ public class CubeCoordinates : MonoBehaviour
 
     private float _spacingVertical = 0.0f;
     private float _spacingHorizontal = 0.0f;
-
-    public float coordinateRadius { get { return _coordinateRadius; } }
 
     private Vector3[] _cubeDirections =
     {
@@ -72,8 +67,6 @@ public class CubeCoordinates : MonoBehaviour
                 for (int z = -radius; z <= radius; z++)
                     if ((x + y + z) == 0)
                         AddCube(new Vector3(x, y, z));
-
-        ShowCoordinatesInContainer("all");
     }
 
     private void Clear()
