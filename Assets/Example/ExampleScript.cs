@@ -11,9 +11,9 @@ public class ExampleScript : MonoBehaviour
         _cubeCoordinates = gameObject.GetComponent<CubeCoordinates>();
     }
 
-    private void Start()
+    private void NewMap()
     {
-        _cubeCoordinates.New(10);
+        _cubeCoordinates.Construct(10);
 
         // Remove 25% of Coordinates except 0,0,0
         foreach (Vector3 cube in _cubeCoordinates.GetCubesFromContainer("all"))
@@ -39,5 +39,10 @@ public class ExampleScript : MonoBehaviour
 
     private void Update()
     {
+        if (Input.GetKeyDown(KeyCode.Return))
+        {
+            NewMap();
+            return;
+        }
     }
 }
