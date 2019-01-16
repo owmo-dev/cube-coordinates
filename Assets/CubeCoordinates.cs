@@ -449,7 +449,7 @@ public class CubeCoordinates : MonoBehaviour
     }
 
     // Returns an ordered list of cube coordinates following the A* path results between two given cube coordinates
-    public List<Vector3> GetPathBetweenTwoCubes(Vector3 origin, Vector3 target, string container)
+    public List<Vector3> GetPathBetweenTwoCubes(Vector3 origin, Vector3 target, string container = "all")
     {
         if (origin == target)
             return new List<Vector3>();
@@ -596,6 +596,19 @@ public class CubeCoordinates : MonoBehaviour
         foreach (Vector3 cube in coordinateContainer.Keys)
             cubes.Add(cube);
         return cubes;
+    }
+
+    // Adds a given cube coordinate to the given container key
+    public void AddCubeToContainer(Vector3 cube, string key)
+    {
+        AddCoordinateToContainer(GetCoordinateFromContainer(cube, "all"), key);
+    }
+
+    // Adds a list of cube coordinates to the given container key
+    public void AddCubesToContainer(List<Vector3> cubes, string key)
+    {
+        foreach (Vector3 cube in cubes)
+            AddCoordinateToContainer(GetCoordinateFromContainer(cube, "all"), key);
     }
 
     // Adds a given Coordinate to the given container key
