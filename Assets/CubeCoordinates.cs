@@ -9,7 +9,7 @@ public class CubeCoordinates : MonoBehaviour
     private GameObject _group;
 
     [SerializeField]
-    private int _radius = 10;
+    private int _tileRadius = 10;
 
     private float _gameScale = 1.0f;
     private float _coordinateRadius = 1.0f;
@@ -47,11 +47,6 @@ public class CubeCoordinates : MonoBehaviour
         CalculateCoordinateDimensions();
     }
 
-    private void Start()
-    {
-        New(_radius);
-    }
-
     // Construction
 
     public void CalculateCoordinateDimensions()
@@ -63,6 +58,8 @@ public class CubeCoordinates : MonoBehaviour
 
         _coordinateHeight = (Mathf.Sqrt(3) / 2.0f) * _coordinateWidth;
         _spacingVertical = _coordinateHeight / 2.0f;
+
+        HexMeshCreator.Instance.SetRadius(_coordinateRadius);
     }
 
     public void New(int radius)
@@ -75,6 +72,8 @@ public class CubeCoordinates : MonoBehaviour
                 for (int z = -radius; z <= radius; z++)
                     if ((x + y + z) == 0)
                         AddCube(new Vector3(x, y, z));
+
+        ShowCoordinatesInContainer("all");
     }
 
     private void Clear()
@@ -112,7 +111,7 @@ public class CubeCoordinates : MonoBehaviour
         if (coordinate == null)
             return;
 
-        RemoveCoordinateFromAllContainers(cube);
+        RemoveCoordinateFromAllContainers(coordinate);
         Destroy(coordinate.gameObject);
     }
 
@@ -352,7 +351,6 @@ public class CubeCoordinates : MonoBehaviour
         return cubes;
     }
 
-    /*
     public List<Vector3> GetLineOfSightBetweenTwoCubes(Vector3 a, Vector3 b, bool cleanResults = true)
     {
         List<Vector3> cubes = new List<Vector3>();
@@ -360,24 +358,18 @@ public class CubeCoordinates : MonoBehaviour
         line.Remove(a);
 
         Coordinate coordinate = GetCoordinateFromContainer(a, "all");
-        float w = coordinate.w;
 
         foreach (Vector3 v in line)
         {
             coordinate = GetCoordinateFromContainer(v, "all");
-            if (Mathf.Abs(coordinate.w - w) > 1.0f)
-                break;
-            else
-                w = coordinate.w;
-
             cubes.Add(v);
         }
+
         cubes.Add(a);
         if (cleanResults)
             return CleanCubeResults(cubes);
         return cubes;
     }
-     */
 
     // Reachable
 
@@ -385,7 +377,7 @@ public class CubeCoordinates : MonoBehaviour
     {
         return new List<Vector3>();
     }
-    /*
+
     public List<Vector3> GetReachableCubes(Vector3 cube, bool cleanResults = true)
     {
         List<Vector3> cubes = new List<Vector3>();
@@ -398,17 +390,13 @@ public class CubeCoordinates : MonoBehaviour
         {
             currentCube = GetNeighborCube(cube, i);
             currentCoordinate = GetCoordinateFromContainer(currentCube, "all");
-            if (currentCoordinate != null)
-            {
-                if (Mathf.Abs(currentCoordinate.w - originCoordinate.w) <= 1.0f)
-                    cubes.Add(currentCube);
-            }
+            cubes.Add(currentCube);
         }
+
         if (cleanResults)
             return CleanCubeResults(cubes);
         return cubes;
     }
-     */
 
     public List<Vector3> GetReachableCubes(Vector3 cube, int radius, bool cleanResults = true)
     {
@@ -629,11 +617,11 @@ public class CubeCoordinates : MonoBehaviour
         return false;
     }
 
-    public void RemoveCoordinateFromContainer(Vector3 cube, string key)
+    public void RemoveCoordinateFromContainer(Coordinate coordinate, string key)
     {
         Dictionary<Vector3, Coordinate> coordinateContainer = GetCoordinateContainer(key);
-        if (coordinateContainer.ContainsKey(cube))
-            coordinateContainer.Remove(cube);
+        if (coordinateContainer.ContainsKey(coordinate.cube))
+            coordinateContainer.Remove(coordinate.cube);
     }
 
     public void RemoveAllCoordinatesInContainer(string key)
@@ -642,10 +630,10 @@ public class CubeCoordinates : MonoBehaviour
         coordinateContainer.Clear();
     }
 
-    public void RemoveCoordinateFromAllContainers(Vector3 cube)
+    public void RemoveCoordinateFromAllContainers(Coordinate coordinate)
     {
         foreach (string key in _coordinateContainers.Keys)
-            RemoveCoordinateFromContainer(cube, key);
+            RemoveCoordinateFromContainer(coordinate, key);
     }
 
     public void ClearAllCoordinateContainers()
@@ -659,26 +647,28 @@ public class CubeCoordinates : MonoBehaviour
         coordinateContainer.Clear();
     }
 
-    /*
     public void HideCoordinatesInContainer(string key)
     {
         foreach (Coordinate coordinate in GetCoordinatesFromContainer(key))
+        {
             coordinate.Hide();
+            RemoveCoordinateFromContainer(coordinate, "visible");
+        }
     }
 
     public void ShowCoordinatesInContainer(string key, bool bCollider = true)
     {
         foreach (Coordinate coordinate in GetCoordinatesFromContainer(key))
+        {
             coordinate.Show(bCollider);
+            AddCoordinateToContainer(coordinate, "visible");
+        }
     }
 
     public void HideAndClearCoordinateContainer(string key)
     {
         foreach (Coordinate coordinate in GetCoordinatesFromContainer(key))
-            coordinate.coordinateDisplayController.ChangeDisplayState(CoordinateDisplayController.State.Hidden);
-        LayoutManager.Instance.ClearCoordinatesFromContainer(key);
+            coordinate.Hide();
+        ClearCoordinatesFromContainer(key);
     }
-     */
-
-
 }
