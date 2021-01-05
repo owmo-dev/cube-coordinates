@@ -8,12 +8,14 @@ namespace CubeCoordinates
         private static GenerateMesh instance;
         public static GenerateMesh Instance
         {
-            get { return instance ?? (instance = new GameObject("GenerateMesh").AddComponent<GenerateMesh>()); }
+            get { return instance ?? (instance = new GameObject("(Singleton)GenerateMesh").AddComponent<GenerateMesh>()); }
         }
 
         public GameObject CreateGameObject(float radius)
         {
             GameObject go = new GameObject("generated");
+            go.hideFlags = HideFlags.HideInHierarchy;
+            go.SetActive(false);
 
             Mesh hexBase = GenerateMesh.Instance.GetHexBase(radius);
             PrepareGameObject(go, hexBase, Color.white);

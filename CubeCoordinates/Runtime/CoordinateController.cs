@@ -5,10 +5,17 @@ namespace CubeCoordinates
 {
     public class CoordinateController : MonoBehaviour
     {
-        private GameObject _coordinateGameObject = null;
-        private Coordinate.Type _coordinateType = Coordinate.Type.Empty;
+        private static CoordinateController instance;
+        public static CoordinateController Instance
+        {
+            get { return instance ?? (instance = new GameObject("(Singleton)CoordinateController").AddComponent<CoordinateController>()); }
+        }
 
-        private GameObject _go;
+        private GameObject _coordinateGroup;
+
+        private Coordinate.Type _coordinateType = Coordinate.Type.Empty;
+        private GameObject _coordinateGameObject = null;
+
         private Dictionary<string, Container> _containers = new Dictionary<string, Container>();
 
         private float _scale = 1.0f;
@@ -36,6 +43,7 @@ namespace CubeCoordinates
 
         private void Awake()
         {
+            _coordinateGroup = new GameObject("(Group)Coordinates");
             CalculateDimensions();
         }
 
@@ -72,10 +80,15 @@ namespace CubeCoordinates
             }
         }
 
-        public List<Vector3> PrepareRadial(int radius)
+        public void Clear()
         {
-            _go = new GameObject(this.GetType().ToString());
+            _containers.Clear();
+            Destroy(_coordinateGroup);
+            _coordinateGroup = new GameObject("(Group)Coordinates");
+        }
 
+        public void BuildRadialCoordinates(int radius)
+        {
             List<Vector3> cubes = new List<Vector3>();
 
             for (int x = -radius; x <= radius; x++)
@@ -84,13 +97,7 @@ namespace CubeCoordinates
                         if ((x + y + z) == 0)
                             cubes.Add(new Vector3(x, y, z));
 
-            return cubes;
-        }
-
-        public void Clear()
-        {
-            Destroy(_go);
-            _containers.Clear();
+            CreateCoordinates(cubes);
         }
 
         public void CreateCoordinates(List<Vector3> cubes)
@@ -119,8 +126,7 @@ namespace CubeCoordinates
                         break;
                 }
 
-                //GameObject go = new GameObject();
-                go.transform.parent = _go.transform;
+                go.transform.parent = _coordinateGroup.transform;
 
                 Coordinate coordinate = go.AddComponent<Coordinate>();
                 coordinate.Init(
@@ -132,12 +138,6 @@ namespace CubeCoordinates
             container.AddCoordinates(coordinates);
         }
 
-        public void CreateContainer(string key)
-        {
-            if (!_containers.ContainsKey(key))
-                _containers.Add(key, new Container(key));
-        }
-
         public Container GetContainer(string key)
         {
             Container container;
@@ -147,6 +147,12 @@ namespace CubeCoordinates
                 _containers.TryGetValue(key, out container);
             }
             return container;
+        }
+
+        private void CreateContainer(string key)
+        {
+            if (!_containers.ContainsKey(key))
+                _containers.Add(key, new Container(key));
         }
 
         public Vector2 ConvertCubeToAxial(Vector3 cube)
@@ -161,10 +167,10 @@ namespace CubeCoordinates
 
         public Vector3 ConvertAxialToWorldPosition(Vector2 axial)
         {
-            float x = axial.x * _spacingX;
-            float z = -((axial.x * _spacingZ) + (axial.y * _spacingZ * 2.0f));
-
-            return new Vector3(x, 0.0f, z);
+            return new Vector3(
+                axial.x * _spacingX,
+                0.0f,
+                -((axial.x * _spacingZ) + (axial.y * _spacingZ * 2.0f)));
         }
 
         public Vector3 ConvertCubeToWorldPosition(Vector3 cube)
@@ -212,7 +218,7 @@ namespace CubeCoordinates
             return new Vector3(rx, ry, rz);
         }
 
-        public Vector3 GetCubeDiagonal(int direction)
+        public Vector3 GetDiagonalCube(int direction)
         {
             return _diagonals[direction];
         }
@@ -227,12 +233,12 @@ namespace CubeCoordinates
             return cube + (_directions[direction] * (float)distance);
         }
 
-        public List<Vector3> GetNeighborCubes(Vector3 cube)
+        public List<Vector3> GetNeighborCubes(Vector3 cube, bool raw=false)
         {
-            return GetNeighborCubes(cube, 1);
+            return GetNeighborCubes(cube, 1, raw);
         }
 
-        public List<Vector3> GetNeighborCubes(Vector3 cube, int radius)
+        public List<Vector3> GetNeighborCubes(Vector3 cube, int radius, bool raw=false)
         {
             List<Vector3> cubes = new List<Vector3>();
             for (int x = (int)(cube.x - radius); x <= (int)(cube.x + radius); x++)
@@ -242,7 +248,7 @@ namespace CubeCoordinates
                             cubes.Add(new Vector3(x, y, z));
 
             cubes.Remove(cube);
-            return CleanCubeResults(cubes);
+            return raw ? cubes : CleanCubeResults(cubes);
         }
 
         public Vector3 GetDiagonalNeighborCube(Vector3 cube, int direction)
@@ -255,49 +261,60 @@ namespace CubeCoordinates
             return cube + _diagonals[direction] * (float)distance;
         }
 
-        public List<Vector3> GetDiagonalNeighborCubes(Vector3 cube)
+        public List<Vector3> GetDiagonalNeighborCubes(Vector3 cube, bool raw=false)
         {
-            return CleanCubeResults(GetDiagonalNeighborCubes(cube, 1));
+            List<Vector3> cubes = new List<Vector3>();
+            cubes = GetDiagonalNeighborCubes(cube, 1);
+            return raw ? cubes : CleanCubeResults(cubes);
         }
 
-        public List<Vector3> GetDiagonalNeighborCubes(Vector3 cube, int distance)
+        public List<Vector3> GetDiagonalNeighborCubes(Vector3 cube, int distance, bool raw=false)
         {
             List<Vector3> cubes = new List<Vector3>();
             for (int i = 0; i < 6; i++)
                 cubes.Add(GetDiagonalNeighborCube(cube, i, distance));
-            return CleanCubeResults(cubes);
+            return raw ? cubes : CleanCubeResults(cubes);
         }
 
-        public List<Vector3> BooleanCombineCubes(List<Vector3> a, List<Vector3> b)
+        public List<Vector3> BooleanCombineCubes(List<Vector3> a, List<Vector3> b, bool raw=false)
         {
-            List<Vector3> vec = a;
+            List<Vector3> cubes = a;
             foreach (Vector3 vb in b)
                 if (!a.Contains(vb))
                     a.Add(vb);
-            return CleanCubeResults(vec);
+            return raw ? cubes : CleanCubeResults(cubes);
         }
 
-        public List<Vector3> BooleanIntersectionCubes(List<Vector3> a, List<Vector3> b)
+        public List<Vector3> BooleanDifferenceCubes(List<Vector3> a, List<Vector3> b, bool raw=false)
         {
-            List<Vector3> vec = new List<Vector3>();
+            List<Vector3> cubes = a;
+            foreach (Vector3 vb in b)
+                if (a.Contains(vb))
+                    a.Remove(vb);
+            return raw ? cubes : CleanCubeResults(cubes);
+        }
+
+        public List<Vector3> BooleanIntersectionCubes(List<Vector3> a, List<Vector3> b, bool raw=false)
+        {
+            List<Vector3> cubes = new List<Vector3>();
             foreach (Vector3 va in a)
                 foreach (Vector3 vb in b)
                     if (va == vb)
-                        vec.Add(va);
-            return CleanCubeResults(vec);
+                        cubes.Add(va);
+            return raw ? cubes : CleanCubeResults(cubes);
         }
 
-        public List<Vector3> BooleanExclusionCubes(List<Vector3> a, List<Vector3> b)
+        public List<Vector3> BooleanExclusionCubes(List<Vector3> a, List<Vector3> b, bool raw=false)
         {
-            List<Vector3> vec = new List<Vector3>();
+            List<Vector3> cubes = new List<Vector3>();
             foreach (Vector3 va in a)
                 foreach (Vector3 vb in b)
                     if (va != vb)
                     {
-                        vec.Add(va);
-                        vec.Add(vb);
+                        cubes.Add(va);
+                        cubes.Add(vb);
                     }
-            return CleanCubeResults(vec);
+            return raw ? cubes : CleanCubeResults(cubes);
         }
 
         public Vector3 RotateCubeCoordinatesRight(Vector3 cube)
@@ -332,14 +349,14 @@ namespace CubeCoordinates
             return RoundCube(GetLerpBetweenTwoCubes(a, b, ((1.0f / cubeDistance) * distance)));
         }
 
-        public List<Vector3> GetLineBetweentwoCubes(Vector3 a, Vector3 b)
+        public List<Vector3> GetLineBetweentwoCubes(Vector3 a, Vector3 b, bool raw=false)
         {
             List<Vector3> cubes = new List<Vector3>();
             float cubeDistance = GetDistanceBetweenTwoCubes(a, b);
             for (int i = 0; i <= cubeDistance; i++)
                 cubes.Add(RoundCube(GetLerpBetweenTwoCubes(a, b, ((1.0f / cubeDistance) * i))));
             cubes.Add(a);
-            return CleanCubeResults(cubes);
+            return raw ? cubes : CleanCubeResults(cubes);
         }
 
         public List<Vector3> GetReachableCubes(Vector3 cube)
@@ -378,29 +395,29 @@ namespace CubeCoordinates
             return visited;
         }
 
-        public List<Vector3> GetSpiralCubes(Vector3 cube, int radius)
+        public List<Vector3> GetSpiralCubes(Vector3 cube, int radius, bool raw=false)
         {
-            List<Vector3> vec = new List<Vector3>();
+            List<Vector3> cubes = new List<Vector3>();
             Vector3 current = cube + _directions[4] * (float)radius;
 
             for (int i = 0; i < 6; i++)
                 for (int j = 0; j < radius; j++)
                 {
-                    vec.Add(current);
+                    cubes.Add(current);
                     current = GetNeighborCube(current, i);
                 }
 
-            return CleanCubeResults(vec);
+            return raw ? cubes : CleanCubeResults(cubes);
         }
 
-        public List<Vector3> GetMultiSpiralCubes(Vector3 cube, int radius)
+        public List<Vector3> GetMultiSpiralCubes(Vector3 cube, int radius, bool raw=false)
         {
             List<Vector3> cubes = new List<Vector3>();
             cubes.Add(cube);
             for (int i = 0; i <= radius; i++)
                 foreach (Vector4 r in GetSpiralCubes(cube, i))
                     cubes.Add(r);
-            return cubes;
+            return raw ? cubes : CleanCubeResults(cubes);
         }
 
         public List<Vector3> GetPathBetweenTwoCubes(Vector3 origin, Vector3 target, string containerLabel = "all")
