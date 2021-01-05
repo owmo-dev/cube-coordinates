@@ -57,6 +57,11 @@ namespace CubeCoordinates
             RemoveCoordinate(coordinate);
         }
 
+        public void RemoveAllCoordinates()
+        {
+            _contents.Clear();
+        }
+
         public Coordinate GetCoordinate(Vector3 cube)
         {
             Coordinate coordinate = null;

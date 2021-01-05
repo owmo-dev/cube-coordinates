@@ -110,7 +110,7 @@ namespace CubeCoordinates
 
         public void PrepareCustomBase(List<Vector3> cubes)
         {
-            CreateCoordinates(cubes);
+            CreateCoordinates (cubes);
         }
 
         public void PrepareRadialBase(int radius)
@@ -128,7 +128,7 @@ namespace CubeCoordinates
                 }
             }
 
-            CreateCoordinates(cubes);
+            CreateCoordinates (cubes);
         }
 
         private void CreateCoordinates(List<Vector3> cubes)
@@ -331,13 +331,17 @@ namespace CubeCoordinates
         }
 
         public List<Coordinate>
-        GetNeighbors(Coordinate origin, int radius, string container = "all")
+        GetNeighbors(
+            Coordinate origin,
+            int radius,
+            string container_label = "all"
+        )
         {
             List<Coordinate> results = new List<Coordinate>();
 
-            Container c = GetContainer(container);
-            List<Coordinate> coordinates = c.GetAllCoordinates();
-            List<Vector3> cubes = c.GetAllCubes();
+            Container container = GetContainer(container_label);
+            List<Coordinate> coordinates = container.GetAllCoordinates();
+            List<Vector3> cubes = container.GetAllCubes();
 
             for (
                 int x = (int)(origin.cube.x - radius);
@@ -543,14 +547,10 @@ namespace CubeCoordinates
         }
 
         public List<Coordinate>
-        GetReachable(Coordinate origin, int radius, string container = "all")
+        GetExpand(Coordinate origin, int steps, string container_label = "all")
         {
             List<Coordinate> results = new List<Coordinate>();
-            if (radius <= 1)
-            {
-                results.Add (origin);
-                return results;
-            }
+            Container container = GetContainer(container_label);
 
             List<Vector3> visited = new List<Vector3>();
             visited.Add(origin.cube);
@@ -559,7 +559,32 @@ namespace CubeCoordinates
             fringes.Add(new List<Vector3>());
             fringes[0].Add(origin.cube);
 
-            // !!! FINISH THIS AFTER IMPLEMENTING "GetNeighbors"
+            for (int i = 1; i <= steps; i++)
+            {
+                fringes.Add(new List<Vector3>());
+                foreach (Vector3 v in fringes[i - 1])
+                {
+                    Coordinate current = container.GetCoordinate(v);
+                    foreach (Coordinate
+                        c
+                        in
+                        GetNeighbors(current, 1, container_label)
+                    )
+                    {
+                        if (!visited.Contains(c.cube))
+                        {
+                            visited.Add(c.cube);
+                            fringes[i].Add(c.cube);
+                        }
+                    }
+                }
+            }
+
+            foreach (Vector3 v in visited)
+            {
+                results.Add(container.GetCoordinate(v));
+            }
+
             return results;
         }
 
@@ -593,12 +618,12 @@ namespace CubeCoordinates
         GetPathBetweenTwoCubes(
             Vector3 origin,
             Vector3 target,
-            string containerLabel = "all"
+            string container_label = "all"
         )
         {
             if (origin == target) return new List<Vector3>();
 
-            Container container = GetContainer(containerLabel);
+            Container container = GetContainer(container_label);
 
             List<Vector3> openSet = new List<Vector3>();
             List<Vector3> closedSet = new List<Vector3>();
