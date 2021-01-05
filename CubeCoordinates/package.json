@@ -1,0 +1,21 @@
+{
+  "name": "com.grantmoore.cubecoordinates",
+  "version": "1.0.0",
+  "displayName": "Cube Coordinates",
+  "description": "Library for constructing hexagonal tile grids via a cube coordinate system",
+  "unity": "2019.4",
+  "unityRelease": "17f1",
+  "keywords": [
+    "hexagonal",
+    "tile",
+    "grid",
+    "coordinates"
+  ],
+  "author": {
+    "name": "Grant Moore",
+    "email": "grantmoore3d@gmail.com",
+    "url": "https://www.grantmoore.ca"
+  },
+  "type": "library",
+  "dependencies": {}
+}
