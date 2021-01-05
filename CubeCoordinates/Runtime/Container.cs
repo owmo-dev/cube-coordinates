@@ -1,21 +1,30 @@
-using UnityEngine;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace CubeCoordinates
 {
     public class Container
     {
         private string _label;
+
         public string label
         {
-            get { return label; }
+            get
+            {
+                return label;
+            }
         }
+
         private Dictionary<Vector3, Coordinate> _contents;
 
         private bool _isVisible;
+
         public bool isVisible
         {
-            get { return _isVisible; }
+            get
+            {
+                return _isVisible;
+            }
         }
 
         public Container(string label)
@@ -33,7 +42,7 @@ namespace CubeCoordinates
         public void AddCoordinates(List<Coordinate> coordinates)
         {
             foreach (Coordinate coordinate in coordinates)
-                AddCoordinate(coordinate);
+            AddCoordinate(coordinate);
         }
 
         public void RemoveCoordinate(Coordinate coordinate)
@@ -45,7 +54,7 @@ namespace CubeCoordinates
         public void RemoveCoordinates(List<Coordinate> coordinates)
         {
             foreach (Coordinate coordinate in coordinates)
-                RemoveCoordinate(coordinate);
+            RemoveCoordinate(coordinate);
         }
 
         public Coordinate GetCoordinate(Vector3 cube)

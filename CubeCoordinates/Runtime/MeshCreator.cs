@@ -1,14 +1,23 @@
-using UnityEngine;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace CubeCoordinates
 {
-    public class GenerateMesh : MonoBehaviour
+    public class MeshCreator : MonoBehaviour
     {
-        private static GenerateMesh instance;
-        public static GenerateMesh Instance
+        private static MeshCreator instance;
+
+        public static MeshCreator Instance
         {
-            get { return instance ?? (instance = new GameObject("(Singleton)GenerateMesh").AddComponent<GenerateMesh>()); }
+            get
+            {
+                return instance
+                    ?? (
+                    instance =
+                        new GameObject("CubeCoordinates.MeshCreator")
+                            .AddComponent<MeshCreator>()
+                    );
+            }
         }
 
         public GameObject CreateGameObject(float radius)
@@ -17,13 +26,13 @@ namespace CubeCoordinates
             go.hideFlags = HideFlags.HideInHierarchy;
             go.SetActive(false);
 
-            Mesh hexBase = GenerateMesh.Instance.GetHexBase(radius);
+            Mesh hexBase = MeshCreator.Instance.GetHexBase(radius);
             PrepareGameObject(go, hexBase, Color.white);
 
             GameObject go_outline = new GameObject("outline");
             go_outline.transform.parent = go.transform;
 
-            Mesh hexOutline = GenerateMesh.Instance.GetHexOutline(radius);
+            Mesh hexOutline = MeshCreator.Instance.GetHexOutline(radius);
             PrepareGameObject(go_outline, hexOutline, Color.black);
 
             return go;
@@ -34,13 +43,13 @@ namespace CubeCoordinates
             MeshRenderer meshRenderer = go.GetComponent<MeshRenderer>();
             if (meshRenderer == null)
                 meshRenderer = go.AddComponent<MeshRenderer>();
-            meshRenderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+            meshRenderer.shadowCastingMode =
+                UnityEngine.Rendering.ShadowCastingMode.Off;
             meshRenderer.receiveShadows = false;
             meshRenderer.material = new Material(Shader.Find("Standard"));
 
             MeshFilter meshFilter = go.GetComponent<MeshFilter>();
-            if (meshFilter == null)
-                meshFilter = go.AddComponent<MeshFilter>();
+            if (meshFilter == null) meshFilter = go.AddComponent<MeshFilter>();
             meshRenderer.material.color = color;
             meshFilter.mesh = mesh;
         }
@@ -174,12 +183,11 @@ namespace CubeCoordinates
 
         private Vector3 GetVertex(int i, float radius)
         {
-            float angle_deg = 60.0f * (float)i;
+            float angle_deg = 60.0f * (float) i;
             float angle_rad = (Mathf.PI / 180.0f) * angle_deg;
             return new Vector3((radius * Mathf.Cos(angle_rad)),
                 0.0f,
-                (radius * Mathf.Sin(angle_rad))
-            );
+                (radius * Mathf.Sin(angle_rad)));
         }
     }
 }
