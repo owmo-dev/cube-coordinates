@@ -1,112 +1,13 @@
 using UnityEngine;
-using System;
 using System.Collections.Generic;
 
 namespace CubeCoordinates
 {
-    public class Coordinate : MonoBehaviour
+    public class CoordinateController : MonoBehaviour
     {
-        private Vector3 _cube = Vector3.zero;
-        public Vector3 cube { get { return _cube; } }
+        private GameObject _coordinateGameObject = null;
+        private Coordinate.Type _coordinateType = Coordinate.Type.Empty;
 
-        private Vector3 _position = Vector3.zero;
-        public Vector3 position { get { return _position; } }
-
-        public float gCost = 0.0f;
-        public float hCost = 0.0f;
-        public float fCost
-        {
-            get { return gCost + hCost; }
-        }
-
-        public void Init(Vector3 cube, Vector3 position)
-        {
-            this._cube = cube;
-            this._position = position;
-            gameObject.transform.position = _position;
-        }
-    }
-
-    public class Container
-    {
-        private string _label;
-        public string label
-        {
-            get { return label; }
-        }
-        private Dictionary<Vector3, Coordinate> _contents;
-
-        private bool _isVisible;
-        public bool isVisible
-        {
-            get { return _isVisible; }
-        }
-
-        public Container(string label)
-        {
-            _label = label;
-            _contents = new Dictionary<Vector3, Coordinate>();
-        }
-
-        public void AddCoordinate(Coordinate coordinate)
-        {
-            if (!_contents.ContainsKey(coordinate.cube))
-                _contents.Add(coordinate.cube, coordinate);
-        }
-
-        public void AddCoordinates(List<Coordinate> coordinates)
-        {
-            foreach (Coordinate coordinate in coordinates)
-                AddCoordinate(coordinate);
-        }
-
-        public void RemoveCoordinate(Coordinate coordinate)
-        {
-            if (_contents.ContainsKey(coordinate.cube))
-                _contents.Remove(coordinate.cube);
-        }
-
-        public void RemoveCoordinates(List<Coordinate> coordinates)
-        {
-            foreach (Coordinate coordinate in coordinates)
-                RemoveCoordinate(coordinate);
-        }
-
-        public Coordinate GetCoordinate(Vector3 cube)
-        {
-            Coordinate coordinate = null;
-            _contents.TryGetValue(cube, out coordinate);
-            return coordinate;
-        }
-
-        public List<Coordinate> GetAllCoordinates()
-        {
-            return new List<Coordinate>(_contents.Values);
-        }
-
-        public List<Vector3> GetAllCubes()
-        {
-            return new List<Vector3>(_contents.Keys);
-        }
-
-        public void Clear()
-        {
-            _contents.Clear();
-        }
-
-        public void Hide()
-        {
-            _isVisible = false;
-        }
-
-        public void Show()
-        {
-            _isVisible = true;
-        }
-    }
-
-    public class Coordinates : MonoBehaviour
-    {
         private GameObject _go;
         private Dictionary<string, Container> _containers = new Dictionary<string, Container>();
 
@@ -142,10 +43,36 @@ namespace CubeCoordinates
         {
             _radius = _radius * _scale;
             _spacingX = _radius * 2 * 0.75f;
-            _spacingZ = (Mathf.Sqrt(3) / 2.0f) * (_radius * 2);
+            _spacingZ = ((Mathf.Sqrt(3) / 2.0f) * (_radius * 2) / 2);
         }
 
-        public void BuildRadial(int radius)
+        public void SetCoordinateType(Coordinate.Type type, GameObject gameObject = null)
+        {
+            _coordinateType = type;
+
+            if (_coordinateGameObject != null)
+                Destroy(_coordinateGameObject);
+
+            switch (_coordinateType)
+            {
+                case Coordinate.Type.Empty:
+                    _coordinateGameObject = null;
+                    break;
+
+                case Coordinate.Type.Prefab:
+                    if (gameObject == null)
+                        _coordinateGameObject = null;
+                    else
+                        _coordinateGameObject = gameObject;
+                    break;
+
+                case Coordinate.Type.GenerateMesh:
+                    _coordinateGameObject = GenerateMesh.Instance.CreateGameObject(_radius);
+                    break;
+            }
+        }
+
+        public List<Vector3> PrepareRadial(int radius)
         {
             _go = new GameObject(this.GetType().ToString());
 
@@ -157,16 +84,16 @@ namespace CubeCoordinates
                         if ((x + y + z) == 0)
                             cubes.Add(new Vector3(x, y, z));
 
-            CreateCoordinates(cubes);
+            return cubes;
         }
 
-        private void Clear()
+        public void Clear()
         {
             Destroy(_go);
             _containers.Clear();
         }
 
-        private void CreateCoordinates(List<Vector3> cubes)
+        public void CreateCoordinates(List<Vector3> cubes)
         {
             Container container = GetContainer("all");
             List<Coordinate> coordinates = new List<Coordinate>();
@@ -176,7 +103,23 @@ namespace CubeCoordinates
                 if (container.GetCoordinate(cube) != null)
                     continue;
 
-                GameObject go = new GameObject("Coordinate: [" + cube.x + "," + cube.y + "," + cube.z + "]");
+                GameObject go = null;
+                string label = "Coordinate: [" + cube.x + "," + cube.y + "," + cube.z + "]";
+
+                switch (_coordinateType)
+                {
+                    case Coordinate.Type.Empty:
+                        go = new GameObject(label);
+                        break;
+
+                    case Coordinate.Type.GenerateMesh:
+                        go = (GameObject)Instantiate(_coordinateGameObject, transform.position, Quaternion.identity);
+                        go.name = label;
+                        go.SetActive(true);
+                        break;
+                }
+
+                //GameObject go = new GameObject();
                 go.transform.parent = _go.transform;
 
                 Coordinate coordinate = go.AddComponent<Coordinate>();
@@ -551,6 +494,5 @@ namespace CubeCoordinates
                     r.Add(cube);
             return r;
         }
-
     }
 }
