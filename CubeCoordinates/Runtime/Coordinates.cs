@@ -438,25 +438,23 @@ namespace CubeCoordinates
             return results;
         }
 
-        /*
-        public List<Vector3>
-        GetPathBetweenTwoCubes(
-            Vector3 origin,
-            Vector3 target,
+        public List<Coordinate>
+        GetPath(
+            Coordinate origin,
+            Coordinate target,
             string container_label = "all"
         )
         {
-            if (origin == target) return new List<Vector3>();
+            if (origin == target) new List<Coordinate>();
 
             Container container = GetContainer(container_label);
-
             List<Vector3> openSet = new List<Vector3>();
             List<Vector3> closedSet = new List<Vector3>();
-            openSet.Add (origin);
+            openSet.Add(origin.cube);
 
             Dictionary<Vector3, Vector3> cameFrom =
                 new Dictionary<Vector3, Vector3>();
-            cameFrom.Add(origin, Vector3.zero);
+            cameFrom.Add(origin.cube, Vector3.zero);
 
             Vector3 current = Vector3.zero;
             Coordinate coordinate = null;
@@ -486,12 +484,18 @@ namespace CubeCoordinates
                 openSet.Remove (current);
                 closedSet.Add (current);
 
-                if (current == target) break;
+                if (current == target.cube) break;
 
-                List<Vector3> neighbors = new List<Vector3>();
-                neighbors = GetReachableCubes(current);
+                List<Coordinate> neighbors =
+                    GetNeighbors(container.GetCoordinate(current),
+                    1,
+                    container_label);
 
-                foreach (Vector3 neighbor in neighbors)
+                foreach (Vector3
+                    neighbor
+                    in
+                    neighbors.Select(x => x.cube).ToList()
+                )
                 {
                     coordinate = container.GetCoordinate(neighbor);
                     if (coordinate == null || closedSet.Contains(neighbor))
@@ -519,10 +523,10 @@ namespace CubeCoordinates
 
             List<Vector3> path = new List<Vector3>();
 
-            current = target;
-            path.Add (target);
+            current = target.cube;
+            path.Add(target.cube);
 
-            while (current != origin)
+            while (current != origin.cube)
             {
                 cameFrom.TryGetValue(current, out current);
                 path.Add (current);
@@ -530,11 +534,12 @@ namespace CubeCoordinates
 
             path.Reverse();
 
-            return path;
+            return container.GetCoordinates(path);
         }
-        */
 
-#region private
+
+#region conversions
+
         private Vector3 RotateCubeCoordinatesRight(Vector3 cube)
         {
             return new Vector3(-cube.z, -cube.x, -cube.y);
