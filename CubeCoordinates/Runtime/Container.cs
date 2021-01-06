@@ -69,6 +69,17 @@ namespace CubeCoordinates
             return coordinate;
         }
 
+        public List<Coordinate> GetCoordinates(List<Vector3> cubes)
+        {
+            List<Coordinate> results = new List<Coordinate>();
+            foreach (Vector3 cube in cubes)
+            {
+                Coordinate coordinate = GetCoordinate(cube);
+                if (coordinate != null) results.Add(coordinate);
+            }
+            return results;
+        }
+
         public List<Coordinate> GetAllCoordinates()
         {
             return new List<Coordinate>(_contents.Values);
