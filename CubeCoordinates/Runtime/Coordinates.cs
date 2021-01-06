@@ -334,32 +334,37 @@ namespace CubeCoordinates
             BooleanIntersect(a, b));
         }
 
-        /*
-
-        public Vector3
-        GetPointOnLineBetweenTwoCubes(Vector3 a, Vector3 b, int distance)
+        public Coordinate
+        GetPointOnLne(
+            Coordinate a,
+            Coordinate b,
+            int distance,
+            string container_label = "all"
+        )
         {
-            float cubeDistance = GetDistanceBetweenTwoCubes(a, b);
-            return RoundCube(GetLerpBetweenTwoCubes(a,
-            b,
-            ((1.0f / cubeDistance) * distance)));
+            float d = GetDistanceBetweenTwoCubes(a.cube, b.cube);
+            return GetContainer(container_label)
+                .GetCoordinate(RoundCube(GetLerpBetweenTwoCubes(a.cube,
+                b.cube,
+                ((1.0f / d) * distance))));
         }
 
-        public List<Vector3>
-        GetLineBetweentwoCubes(Vector3 a, Vector3 b, bool raw = false)
+        public List<Coordinate>
+        GetLine(Coordinate a, Coordinate b, string container_label = "all")
         {
             List<Vector3> cubes = new List<Vector3>();
-            float cubeDistance = GetDistanceBetweenTwoCubes(a, b);
-            for (int i = 0; i <= cubeDistance; i++)
-            cubes
-                .Add(RoundCube(GetLerpBetweenTwoCubes(a,
-                b,
-                ((1.0f / cubeDistance) * i))));
-            cubes.Add (a);
-            return raw ? cubes : CleanCubeResults(cubes);
+            float distance = GetDistanceBetweenTwoCubes(a.cube, b.cube);
+            for (int i = 0; i <= distance; i++)
+            {
+                cubes
+                    .Add(RoundCube(GetLerpBetweenTwoCubes(a.cube,
+                    b.cube,
+                    ((1.0f / distance) * i))));
+            }
+            cubes.Add(a.cube);
+            return GetContainer(container_label).GetCoordinates(cubes);
         }
 
-        */
         public List<Coordinate>
         GetExpand(Coordinate origin, int steps, string container_label = "all")
         {
@@ -526,16 +531,6 @@ namespace CubeCoordinates
             path.Reverse();
 
             return path;
-        }
-        */
-        /*
-        public List<Vector3> CleanCubeResults(List<Vector3> cubes)
-        {
-            Container container = GetContainer();
-            List<Vector3> r = new List<Vector3>();
-            foreach (Vector3 cube in cubes)
-            if (container.GetCoordinate(cube) != null) r.Add(cube);
-            return r;
         }
         */
 
