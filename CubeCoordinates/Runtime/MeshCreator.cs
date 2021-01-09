@@ -26,16 +26,26 @@ namespace CubeCoordinates
             go.hideFlags = HideFlags.HideInHierarchy;
             go.SetActive(false);
 
-            Mesh hexBase = MeshCreator.Instance.GetHexBase(radius);
-            PrepareGameObject(go, hexBase, Color.white);
+            AddBaseMeshToGameObject(go, radius, Color.white);
 
             GameObject go_outline = new GameObject("outline");
             go_outline.transform.parent = go.transform;
 
-            Mesh hexOutline = MeshCreator.Instance.GetHexOutline(radius);
-            PrepareGameObject(go_outline, hexOutline, Color.black);
+            AddOutlineMeshToGameObject(go_outline, radius, Color.black);
 
             return go;
+        }
+
+        public void AddBaseMeshToGameObject(GameObject go, float radius, Color color)
+        {
+            Mesh mesh = MeshCreator.Instance.GetHexBase(radius);
+            PrepareGameObject(go, mesh, color);
+        }
+
+        public void AddOutlineMeshToGameObject(GameObject go, float radius, Color color)
+        {
+            Mesh mesh = MeshCreator.Instance.GetHexOutline(radius);
+            PrepareGameObject(go, mesh, color);
         }
 
         private void PrepareGameObject(GameObject go, Mesh mesh, Color color)
@@ -108,7 +118,7 @@ namespace CubeCoordinates
             Vector3[] v = new Vector3[12];
 
             float upOffset = radius * 0.005f;
-            float innerRadius = radius * 0.9f;
+            float innerRadius = radius * 0.8f;
 
             v[0] = verts[0] + (Vector3.up * upOffset);
             v[1] = verts[1] + (Vector3.up * upOffset);

@@ -17,16 +17,6 @@ namespace CubeCoordinates
 
         private Dictionary<Vector3, Coordinate> _contents;
 
-        private bool _isVisible;
-
-        public bool isVisible
-        {
-            get
-            {
-                return _isVisible;
-            }
-        }
-
         public Container(string label)
         {
             _label = label;
@@ -69,6 +59,12 @@ namespace CubeCoordinates
             return coordinate;
         }
 
+        public Coordinate GetCoordinateFromWorldPosition(Vector3 position, float radius)
+        {
+            Vector3 cube = Cubes.ConvertWorldPositionToCube(position, radius);
+            return GetCoordinate(cube);
+        }
+
         public List<Coordinate> GetCoordinates(List<Vector3> cubes)
         {
             List<Coordinate> results = new List<Coordinate>();
@@ -88,21 +84,6 @@ namespace CubeCoordinates
         public List<Vector3> GetAllCubes()
         {
             return new List<Vector3>(_contents.Keys);
-        }
-
-        public void Clear()
-        {
-            _contents.Clear();
-        }
-
-        public void Hide()
-        {
-            _isVisible = false;
-        }
-
-        public void Show()
-        {
-            _isVisible = true;
         }
     }
 }
