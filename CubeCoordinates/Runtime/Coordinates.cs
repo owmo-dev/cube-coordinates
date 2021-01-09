@@ -6,12 +6,22 @@ namespace CubeCoordinates
 {
     public class Coordinates : MonoBehaviour
     {
-        private static Coordinates instance;
+        private static Coordinates _instance;
+        private static readonly object Lock = new object();
+
         public static Coordinates Instance
         { 
             get
             {
-                return instance ?? ( instance = new GameObject("CubeCoordinates.Coordinates").AddComponent<Coordinates>() );
+                lock(Lock)
+                {
+                    if (_instance != null)
+                        return _instance;
+
+                    GameObject obj = new GameObject("{MonoBehaviour}<{" + typeof(Coordinates).ToString() + "}>");
+                    DontDestroyOnLoad(obj);
+                    return _instance = obj.AddComponent<Coordinates>();
+                }
             }
         }
 

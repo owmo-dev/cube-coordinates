@@ -5,18 +5,22 @@ namespace CubeCoordinates
 {
     public class MeshCreator : MonoBehaviour
     {
-        private static MeshCreator instance;
+        private static MeshCreator _instance;
+        private static readonly object Lock = new object();
 
         public static MeshCreator Instance
-        {
+        { 
             get
             {
-                return instance
-                    ?? (
-                    instance =
-                        new GameObject("CubeCoordinates.MeshCreator")
-                            .AddComponent<MeshCreator>()
-                    );
+                lock(Lock)
+                {
+                    if (_instance != null)
+                        return _instance;
+
+                    GameObject obj = new GameObject("{MonoBehaviour}<{" + typeof(MeshCreator).ToString() + "}>");
+                    DontDestroyOnLoad(obj);
+                    return _instance = obj.AddComponent<MeshCreator>();
+                }
             }
         }
 

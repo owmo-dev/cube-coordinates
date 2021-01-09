@@ -6,14 +6,7 @@ namespace CubeCoordinates
     public class Container
     {
         private string _label;
-
-        public string label
-        {
-            get
-            {
-                return label;
-            }
-        }
+        public string label { get { return label; } }
 
         private Dictionary<Vector3, Coordinate> _contents;
 
@@ -32,7 +25,7 @@ namespace CubeCoordinates
         public void AddCoordinates(List<Coordinate> coordinates)
         {
             foreach (Coordinate coordinate in coordinates)
-            AddCoordinate(coordinate);
+                AddCoordinate(coordinate);
         }
 
         public void RemoveCoordinate(Coordinate coordinate)
@@ -44,7 +37,7 @@ namespace CubeCoordinates
         public void RemoveCoordinates(List<Coordinate> coordinates)
         {
             foreach (Coordinate coordinate in coordinates)
-            RemoveCoordinate(coordinate);
+                RemoveCoordinate(coordinate);
         }
 
         public void RemoveAllCoordinates()
