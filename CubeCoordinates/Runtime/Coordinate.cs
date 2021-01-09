@@ -4,7 +4,7 @@ namespace CubeCoordinates
 {
     public class Coordinate
     {
-        public enum DisplayType
+        public enum Type
         {
             None,
             Prefab,
