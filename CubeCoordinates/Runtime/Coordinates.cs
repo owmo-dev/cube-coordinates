@@ -83,19 +83,7 @@ namespace CubeCoordinates
             }
         }
 
-        public void PrepareCustomBase(List<Vector3> cubes)
-        {
-            CreateCoordinates (cubes);
-        }
-
-        public void PrepareRadialBase(int r)
-        {
-            CreateCoordinates(
-                Cubes.GetNeighbors(Vector3.zero, r)
-            );
-        }
-
-        private void CreateCoordinates(List<Vector3> cubes)
+        public void CreateCoordinates(List<Vector3> cubes)
         {
             Container container = GetContainer();
             List<Coordinate> coordinates = new List<Coordinate>();
@@ -104,10 +92,10 @@ namespace CubeCoordinates
             {
                 if (container.GetCoordinate(cube) != null) continue;
                 Coordinate coordinate = new Coordinate(cube, Cubes.ConvertCubeToWorldPosition(cube, _spacingX, _spacingZ));
-                coordinates.Add (coordinate);
+                coordinates.Add(coordinate);
             }
 
-            container.AddCoordinates (coordinates);
+            container.AddCoordinates(coordinates);
         }
 
         public void Build()
@@ -163,13 +151,13 @@ namespace CubeCoordinates
             );
         }
 
-        public List<Coordinate> GetDiagonalNeighbors( Coordinate origin, int steps, string container_label = "all" )
+        public List<Coordinate> GetDiagonalNeighbors( Coordinate origin, int distance, string container_label = "all" )
         {
             List<Coordinate> results = new List<Coordinate>();
             Container container = GetContainer(container_label);
             for (int i = 0; i < 6; i++)
             {
-                Coordinate coordinate = GetDiagonalNeighbor(origin, i, steps, container_label);
+                Coordinate coordinate = GetDiagonalNeighbor(origin, i, distance, container_label);
                 if (coordinate != null) results.Add(coordinate);
             }
             return results;
@@ -200,6 +188,46 @@ namespace CubeCoordinates
         {
             return GetContainer(container_label).GetCoordinates(
                 Cubes.GetSpiral(origin.cube, steps)
+            );
+        }
+
+        public List<Coordinate> BooleanCombine(List<Coordinate> a, List<Coordinate> b, string container_label = "all" )
+        {
+            return GetContainer(container_label).GetCoordinates(
+                Cubes.BooleanCombine(
+                    a.Select(x => x.cube).ToList(),
+                    b.Select(x => x.cube).ToList()
+                )
+            );
+        }
+
+        public List<Coordinate> BooleanDifference(List<Coordinate> a, List<Coordinate> b, string container_label = "all")
+        {
+            return GetContainer(container_label).GetCoordinates(
+                Cubes.BooleanDifference(
+                    a.Select(x => x.cube).ToList(),
+                    b.Select(x => x.cube).ToList()
+                )
+            );
+        }
+
+        public List<Coordinate> BooleanIntersect(List<Coordinate> a, List<Coordinate> b, string container_label = "all")
+        {
+            return GetContainer(container_label).GetCoordinates(
+                Cubes.BooleanIntersect(
+                    a.Select(x => x.cube).ToList(),
+                    b.Select(x => x.cube).ToList()
+                )
+            );
+        }
+
+        public List<Coordinate> BooleanExclude(List<Coordinate> a, List<Coordinate> b, string container_label = "all")
+        {
+            return GetContainer(container_label).GetCoordinates(
+                Cubes.BooleanExclude(
+                    a.Select(x => x.cube).ToList(),
+                    b.Select(x => x.cube).ToList()
+                )
             );
         }
 

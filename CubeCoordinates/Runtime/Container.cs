@@ -16,28 +16,28 @@ namespace CubeCoordinates
             _contents = new Dictionary<Vector3, Coordinate>();
         }
 
-        public void AddCoordinate(Coordinate coordinate)
+        public void AddCoordinates(Coordinate coordinate)
         {
-            if (!_contents.ContainsKey(coordinate.cube))
-                _contents.Add(coordinate.cube, coordinate);
+            AddCoordinates(new List<Coordinate>{coordinate});
         }
 
         public void AddCoordinates(List<Coordinate> coordinates)
         {
             foreach (Coordinate coordinate in coordinates)
-                AddCoordinate(coordinate);
+                if (!_contents.ContainsKey(coordinate.cube))
+                    _contents.Add(coordinate.cube, coordinate);
         }
 
-        public void RemoveCoordinate(Coordinate coordinate)
+        public void RemoveCoordinates(Coordinate coordinate)
         {
-            if (_contents.ContainsKey(coordinate.cube))
-                _contents.Remove(coordinate.cube);
+            RemoveCoordinates(new List<Coordinate>{coordinate});
         }
 
         public void RemoveCoordinates(List<Coordinate> coordinates)
         {
             foreach (Coordinate coordinate in coordinates)
-                RemoveCoordinate(coordinate);
+                if (_contents.ContainsKey(coordinate.cube))
+                    _contents.Remove(coordinate.cube);
         }
 
         public void RemoveAllCoordinates()
