@@ -34,9 +34,13 @@ namespace CubeCoordinates
         public static List<Vector3> GetNeighbors(Vector3 origin, int steps)
         {
             List<Vector3> results = new List<Vector3>();
-            for (int i=0; i < 6; i++)
-                for (int s=0; s <= steps; s++)
-                    results.Add(GetNeighbor(origin, i, s));
+
+            for (int x = (int)(origin.x - steps); x <= (int)(origin.x + steps); x++)
+                for (int y = (int)(origin.y - steps); y <= (int)(origin.y + steps); y++)
+                    for (int z = (int)(origin.z - steps); z <= (int)(origin.z + steps); z++)
+                        if ((x + y + z) == 0)
+                            results.Add(new Vector3(x, y, z));
+
             return results;
         }
 
@@ -45,11 +49,11 @@ namespace CubeCoordinates
             return origin + diagonals[direction] * (float)distance;
         }
 
-        public static List<Vector3> GetDiagonalNeighbors(Vector3 origin, int steps)
+        public static List<Vector3> GetDiagonalNeighbors(Vector3 origin, int distance)
         {
             List<Vector3> results = new List<Vector3>();
             for (int i=0; i < 6; i++)
-                for (int s=0; s <= steps; s++)
+                for (int s=1; s <= distance; s++)
                     results.Add(GetDiagonalNeighbor(origin, i, s));
             return results;
         }
@@ -96,7 +100,8 @@ namespace CubeCoordinates
 
         public static List<Vector3> BooleanCombine(List<Vector3> a, List<Vector3> b)
         {
-            List<Vector3> results = a;
+            List<Vector3> results = new List<Vector3>();
+            results.AddRange(a);
             foreach (Vector3 vb in b)
                 if (!a.Contains(vb))
                     results.Add(vb);
@@ -105,7 +110,8 @@ namespace CubeCoordinates
 
         public static List<Vector3> BooleanDifference(List<Vector3> a, List<Vector3> b)
         {
-            List<Vector3> results = a;
+            List<Vector3> results = new List<Vector3>();
+            results.AddRange(a);
             foreach (Vector3 vb in b)
                 if (a.Contains(vb))
                     results.Remove(vb);
@@ -126,7 +132,7 @@ namespace CubeCoordinates
         {
             return BooleanDifference(
                 BooleanCombine(a,b),
-                BooleanIntersect(a, b)
+                BooleanIntersect(a,b)
             );
         }
 
