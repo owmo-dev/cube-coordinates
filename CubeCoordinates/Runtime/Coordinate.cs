@@ -12,17 +12,46 @@ namespace CubeCoordinates
         }
 
         private Vector3 _cube = Vector3.zero;
-        public Vector3 cube { get { return _cube; } }
+
+        public Vector3 cube
+        {
+            get
+            {
+                return _cube;
+            }
+        }
 
         private Vector3 _position = Vector3.zero;
-        public Vector3 position { get { return _position; } }
+
+        public Vector3 position
+        {
+            get
+            {
+                return _position;
+            }
+        }
 
         public float gCost = 0.0f;
+
         public float hCost = 0.0f;
-        public float fCost { get { return gCost + hCost; } }
+
+        public float fCost
+        {
+            get
+            {
+                return gCost + hCost;
+            }
+        }
 
         private GameObject _go;
-        public GameObject go { get { return _go; } }
+
+        public GameObject go
+        {
+            get
+            {
+                return _go;
+            }
+        }
 
         public Coordinate(Vector3 cube, Vector3 position)
         {

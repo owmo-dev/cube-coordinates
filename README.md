@@ -29,7 +29,7 @@ Please go to the [examples](examples) folder to see more complex usages.
 
 #### Coordinates
 
-Used to create and manage `Coordinate` instances, it provides a default `Container` labelled `"all"` which is treated as the master list which all methods operate.
+Used to create and manage `Coordinate` instances, it uses an `"all"` default `Container` as the master list for it's methods.
 
 ```csharp
 Coordinates coordinates = Coordinates.Instance;
@@ -54,7 +54,7 @@ List<Coordinate> path = Coordinates.Instance.GetPath(origin, destination);
 
 #### Coordinate
 
-An individual `Coordinate` instance represents a tile on the grid, keeps track of it's own cube coordinate, transform positon and GameObject associated with it, and can be used in various methods to find other `Coordinate` instances.
+Individual `Coordinate` instances represents tiles on the grid. It's purpose is to keep track of cube coordinates, transform position in world space, reference any GameObject instantiated to represent it, facilitate path finding by storing cost values and be supplied as an origin for many `Coordinate` operations.
 
 ```csharp
 Coordinate coordinate = Coordinates.Instance.GetContainer().GetCoordinate(new Vector3(4,1,-5));
@@ -64,13 +64,13 @@ coordinate.SetGameObject(myGameObject);
 
 #### Container
 
-Any number of `Container` instances can be created (optional, except for the default `"all"`) in order to track your own lists of `Coordinate` instances to be retreived later for your own purposes.
+Any number of `Container` instances can be optionally created - except for `"all"`, which `Coordinates` uses as a master list internally - to manage your own lists of `Coordinate` instances that you can later retrieve for your own purposes.
 
 ```csharp
-Container movement_range = Coordinates.Instance.GetContainer("movement_range");
-movement_range.AddCoordinates( new List<Coordinate>{coordinateA, coordinateB});
+Container moveArea = Coordinates.Instance.GetContainer("move_area");
+moveArea.AddCoordinates( new List<Coordinate>{coordinateA, coordinateB});
 
-foreach(Coordinate c in movement_range.GetAllCoordinates())
+foreach(Coordinate c in moveArea.GetAllCoordinates())
     c.go.GetComponent<MyScript>().DoSomething();
 
 movement_range.RemoveAllCoordinates();
@@ -78,7 +78,7 @@ movement_range.RemoveAllCoordinates();
 
 #### Cubes
 
-Collection of cube coordinate system methods for quickly calculating desired coordinate results. Primarily used by the `Coordinates` class, it returns coordinate results without guarantee they have been instantiated. Using `Cubes` directly is desireable for combining serveral operations together before retreiving the results from a `Container`.
+Collection of cube coordinate system methods for calculating desired coordinate results. These methods _do not_ map to `Coordinate` instances; they simply calculate results from an infinite plane of coordinates as requested. Using `Cubes` directly is desirable when combining several operations together because you can calculate the results and last pull any matching `Coordinate` instances from a `Container` by supplying the results.
 
 ```csharp
 List<Vector3> attackShape = Cubes.BooleanCombine(
@@ -88,12 +88,15 @@ List<Vector3> attackShape = Cubes.BooleanCombine(
 
 Vector3 activeCube = Cubes.ConvertWorldPositionToCube(myGameObject.transform.position);
 
-List<Vector3> attackShapeTransformed = new List<Vector3>();
-foreach(Vector3 cube in attackShape)
-    attackShapeTransformed.Add(cube + activeCube);
+List<Vector3> attackShapeOnMap = new List<Vector3>();
+foreach (Vector3 cube in attackShape)
+    attackShapeOnMap.Add(cube + activeCube);
 
-Container attack = Coordinates.Instance.GetContainer("attack");
-List<Coordinate> attachShapeCoordinates = attack.GetCoordinates(attackShapeTransformed);
+Container attackTiles = Coordinates.Instance.GetContainer("attack_tiles");
+List<Coordinate> attackShapeCoordinates = attackTiles.GetCoordinates(attackShapeOnMap);
+
+foreach (Coordinate c in attackShapeCoordinates)
+    c.go.GetComponent<MyScript>().DoSomething();
 ```
 
 #### MeshCreator
@@ -104,6 +107,6 @@ Used to generate hexagonal meshes when using `Coordinate.Type.GenerateMesh` whic
 
 ### Development
 
-This package is being developed as part of a hobby indie game (Tactical RPG, TBD). There are no immediate plans to add features, improve useability or support users of this library. `CubeCoordinates` is an implementation of:
+This package is being developed as part of a hobby indie game - TBD Tactical RPG - and there are no plans for a development roadmap or gaurantee of non-breaking changes between versions. I welcome any bug reports or suggestions, but please consider this as a resource for learning and if you intend to use it, make a fork so you can maintain a stable copy or extend it however you wish. This `CubeCoordinates` library is an implementation of the following:
 
 https://www.redblobgames.com/grids/hexagons/

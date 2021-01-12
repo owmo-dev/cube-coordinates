@@ -6,19 +6,22 @@ namespace CubeCoordinates
     public class MeshCreator : MonoBehaviour
     {
         private static MeshCreator _instance;
+
         private static readonly object Lock = new object();
 
         public static MeshCreator Instance
-        { 
+        {
             get
             {
-                lock(Lock)
+                lock (Lock)
                 {
-                    if (_instance != null)
-                        return _instance;
+                    if (_instance != null) return _instance;
 
-                    GameObject obj = new GameObject("{MonoBehaviour}<{" + typeof(MeshCreator).ToString() + "}>");
-                    DontDestroyOnLoad(obj);
+                    GameObject obj =
+                        new GameObject("{MonoBehaviour}<{" +
+                            typeof (MeshCreator).ToString() +
+                            "}>");
+                    DontDestroyOnLoad (obj);
                     return _instance = obj.AddComponent<MeshCreator>();
                 }
             }
@@ -40,16 +43,24 @@ namespace CubeCoordinates
             return go;
         }
 
-        public void AddBaseMeshToGameObject(GameObject go, float radius, Color color)
+        public void AddBaseMeshToGameObject(
+            GameObject go,
+            float radius,
+            Color color
+        )
         {
             Mesh mesh = MeshCreator.Instance.GetHexBase(radius);
-            PrepareGameObject(go, mesh, color);
+            PrepareGameObject (go, mesh, color);
         }
 
-        public void AddOutlineMeshToGameObject(GameObject go, float radius, Color color)
+        public void AddOutlineMeshToGameObject(
+            GameObject go,
+            float radius,
+            Color color
+        )
         {
             Mesh mesh = MeshCreator.Instance.GetHexOutline(radius);
-            PrepareGameObject(go, mesh, color);
+            PrepareGameObject (go, mesh, color);
         }
 
         private void PrepareGameObject(GameObject go, Mesh mesh, Color color)
