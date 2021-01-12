@@ -3,27 +3,38 @@ using UnityEngine;
 
 namespace CubeCoordinates
 {
+    /// <summary>
+    /// Generates hexagonal meshes useful for debugging and prototyping purposes
+    /// </summary>
     public class MeshCreator : MonoBehaviour
     {
         private static MeshCreator _instance;
+
         private static readonly object Lock = new object();
 
         public static MeshCreator Instance
-        { 
+        {
             get
             {
-                lock(Lock)
+                lock (Lock)
                 {
-                    if (_instance != null)
-                        return _instance;
+                    if (_instance != null) return _instance;
 
-                    GameObject obj = new GameObject("{MonoBehaviour}<{" + typeof(MeshCreator).ToString() + "}>");
-                    DontDestroyOnLoad(obj);
+                    GameObject obj =
+                        new GameObject("{MonoBehaviour}<{" +
+                            typeof (MeshCreator).ToString() +
+                            "}>");
+                    DontDestroyOnLoad (obj);
                     return _instance = obj.AddComponent<MeshCreator>();
                 }
             }
         }
 
+        /// <summary>
+        /// Generates a GameObject with hexagonal and outline meshes
+        /// </summary>
+        /// <param name="radius">Radius of the tile geometry</param>
+        /// <returns>GameObject</returns>
         public GameObject CreateGameObject(float radius)
         {
             GameObject go = new GameObject("generated");
@@ -40,18 +51,44 @@ namespace CubeCoordinates
             return go;
         }
 
-        public void AddBaseMeshToGameObject(GameObject go, float radius, Color color)
+        /// <summary>
+        /// Generates the base hexagonal mesh and adds it to the specified GameObject
+        /// </summary>
+        /// <param name="go">GameObject to add mesh to</param>
+        /// <param name="radius">Radius of the tile geometry</param>
+        /// <param name="color">Color to apply to the geometry</param>
+        public void AddBaseMeshToGameObject(
+            GameObject go,
+            float radius,
+            Color color
+        )
         {
             Mesh mesh = MeshCreator.Instance.GetHexBase(radius);
-            PrepareGameObject(go, mesh, color);
+            PrepareGameObject (go, mesh, color);
         }
 
-        public void AddOutlineMeshToGameObject(GameObject go, float radius, Color color)
+        /// <summary>
+        /// Generates the outline mesh and adds it to the specified GameObject
+        /// </summary>
+        /// <param name="go">GameObject to add mesh to</param>
+        /// <param name="radius">Radius of the outline geometry</param>
+        /// <param name="color">Color to apply to the geometry</param>
+        public void AddOutlineMeshToGameObject(
+            GameObject go,
+            float radius,
+            Color color
+        )
         {
             Mesh mesh = MeshCreator.Instance.GetHexOutline(radius);
-            PrepareGameObject(go, mesh, color);
+            PrepareGameObject (go, mesh, color);
         }
 
+        /// <summary>
+        /// Prepares a GameObject with MeshRenderer and MeshFilter
+        /// </summary>
+        /// <param name="go">GameObject to add Components to</param>
+        /// <param name="mesh">Mesh to add to GameObject</param>
+        /// <param name="color">Color to apply to MeshRenderer</param>
         private void PrepareGameObject(GameObject go, Mesh mesh, Color color)
         {
             MeshRenderer meshRenderer = go.GetComponent<MeshRenderer>();
@@ -68,6 +105,11 @@ namespace CubeCoordinates
             meshFilter.mesh = mesh;
         }
 
+        /// <summary>
+        /// Generates a hexagonal base Mesh
+        /// </summary>
+        /// <param name="radius">Radius of the hexagonal mesh to create</param>
+        /// <returns>Mesh geometry</returns>
         private Mesh GetHexBase(float radius)
         {
             Mesh mesh = new Mesh();
@@ -105,6 +147,11 @@ namespace CubeCoordinates
             return mesh;
         }
 
+        /// <summary>
+        /// Generates a hexagonal outline Mesh
+        /// </summary>
+        /// <param name="radius">Radius of the hexagonal outline mesh to create</param>
+        /// <returns>Mesh geometry</returns>
         private Mesh GetHexOutline(float radius)
         {
             Mesh mesh = new Mesh();
@@ -195,6 +242,12 @@ namespace CubeCoordinates
             return mesh;
         }
 
+        /// <summary>
+        /// Retruns a vertex for mesh generation
+        /// </summary>
+        /// <param name="i">index</param>
+        /// <param name="radius">radius</param>
+        /// <returns>Vector3</returns>
         private Vector3 GetVertex(int i, float radius)
         {
             float angle_deg = 60.0f * (float) i;
