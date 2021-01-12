@@ -176,32 +176,30 @@ namespace CubeCoordinates
             return new Vector3(axial.x, (-axial.x - axial.y), axial.y);
         }
 
-        public static Vector3 ConvertAxialToWorldPosition(Vector2 axial, float spacingX, float spacingZ)
+        public static Vector3 ConvertAxialToWorldPosition(Vector2 axial)
         {
-            return new Vector3(axial.x * spacingX,
+            return new Vector3(axial.x * Coordinates.Instance.spacingX,
                 0.0f,
-                -((axial.x * spacingZ) + (axial.y * spacingZ * 2.0f)));
+                -((axial.x * Coordinates.Instance.spacingZ) + (axial.y * Coordinates.Instance.spacingZ * 2.0f)));
         }
 
-        public static Vector3 ConvertCubeToWorldPosition(Vector3 cube, float spacingX, float spacingZ)
+        public static Vector3 ConvertCubeToWorldPosition(Vector3 cube)
         {
-            return new Vector3(cube.x * spacingX,
+            return new Vector3(cube.x * Coordinates.Instance.spacingX,
                 0.0f,
-                -((cube.x * spacingZ) + (cube.z * spacingZ * 2.0f)));
+                -((cube.x * Coordinates.Instance.spacingZ) + (cube.z * Coordinates.Instance.spacingZ * 2.0f)));
         }
 
-        public static Vector2 ConvertWorldPositionToAxial(Vector3 wPos, float radius)
+        public static Vector2 ConvertWorldPositionToAxial(Vector3 cube)
         {
-            float q = (wPos.x * (2.0f / 3.0f)) / radius;
-            float r =
-                ((-wPos.x / 3.0f) + ((Mathf.Sqrt(3) / 3.0f) * wPos.z)) /
-                radius;
+            float q = (cube.x * (2.0f / 3.0f)) / Coordinates.Instance.radius;
+            float r = ((-cube.x / 3.0f) + ((Mathf.Sqrt(3) / 3.0f) * cube.z)) / Coordinates.Instance.radius;
             return RoundAxial(new Vector2(q, r));
         }
 
-        public static Vector3 ConvertWorldPositionToCube(Vector3 wPos, float radius)
+        public static Vector3 ConvertWorldPositionToCube(Vector3 cube)
         {
-            return ConvertAxialToCube(ConvertWorldPositionToAxial(wPos, radius));
+            return ConvertAxialToCube(ConvertWorldPositionToAxial(cube));
         }
 
         public static Vector2 RoundAxial(Vector2 axial)

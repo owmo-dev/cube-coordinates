@@ -44,8 +44,8 @@ namespace CubeCoordinates
 
         private void Awake()
         {
-            _coordinateGroup = new GameObject("(Group) Coordinates");
             CalculateDimensions();
+            _coordinateGroup = new GameObject("(Group) Coordinates");
         }
 
         private void CalculateDimensions()
@@ -91,7 +91,7 @@ namespace CubeCoordinates
             foreach (Vector3 cube in cubes)
             {
                 if (container.GetCoordinate(cube) != null) continue;
-                Coordinate coordinate = new Coordinate(cube, Cubes.ConvertCubeToWorldPosition(cube, _spacingX, _spacingZ));
+                Coordinate coordinate = new Coordinate(cube, Cubes.ConvertCubeToWorldPosition(cube));
                 coordinates.Add(coordinate);
             }
 

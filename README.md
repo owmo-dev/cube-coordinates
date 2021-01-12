@@ -1,71 +1,105 @@
-# unity-hexagonal-grids
+# unity-package-library-CubeCoordinates
 
-Collection of cube coordinate functionality for constructing and interacting with hexagonal grids in Unity.
+Unity package providing a cube coordinate system and methods for building hexagonal tile grids for interactive gameplay.
 
-![Constructed Grid](images/grid_build.jpg) | ![A* Path Tracing](images/grid_path.jpg) | ![Reachable Coordinates](images/grid_reachable.jpg)
--|-|-
+| ![Build a grid of cube coordinates](images/grid_build.jpg) | ![A* Path Tracing](images/grid_path.jpg) | ![Expand to connected coordinates](images/grid_expand.jpg) |
+| ---------------------------------------------------------- | ---------------------------------------- | ---------------------------------------------------------- |
 
-## Scripts
-The repository contains the following scripts within the `Assets` folder:
+## CubeCoordinates
 
-#### Coordinate.cs
-Responsible for the information pertaining to a single `Coordinate` within the `CubeCoordinate` grid; cube coordinate, transform position, A* path costs, meshes, display/hide functionality, etc...
-
-#### CubeCoordinates.cs
-Responsible for the construction of a hexagonal grid of `Coordinate` instances, managing named containers of `Coordinate` instances for building interactions with the grid, and performing validated coordinate manipulations.
-
-#### HexMeshCreator.cs
-Singleton used to provide each `Coordinate` with an appropriate hexagonal mesh for display.
-
----
-## Example
-The repository contains the following example within the `Assets\Example` folder:
-
-#### ExampleScene.unity
-The scene contains GameObject named "ExampleCubeCoordinate" within the scene that has the `CubeCoordinate` and `ExampleScript` components added to it.
-
-#### ExampleScript.cs
-Sets up an example scene (as seen in the above images) which constructs a grid with some minimal randomization, performs a some of the coordinate manipulations and stores them in coordinate containers to be displayed using the following key presses:
-
-- Return > Constructs the grid
-- Backspace > Displays all grid coordinates
-- L > Displays a line between two coordinates (non-contiguous if coordinates are missing)
-- P > Displays an A* path between two coordinates
-- S > Displays a spiral, 3 coordinates away from zero
-- R > Displays a reachable set of tiles up to 3 coordinates away from zero
-
-Example usage:
+To install, copy the `CubeCoordinates` Unity Package directory into your project's `Packages` directory.
 
 ```csharp
-// Construct a grid with radius of 10
-CubeCoordinates cubeCoordinates;
-cubeCoordinates = gameObject.GetComponent<CubeCoordinates>();
-cubeCoordinates.Construct(10);
+using CubeCoordinates;
 
-// Randomly sample coordinates and add them to a "random" coordinate container
-foreach(Vector3 cube in cubeCoordinates.GetCubesFromContainer("all"))
-    if (Random.Range(0.0f, 100.0f) < 25.0f)
-        cubeCoordinates.AddCubeToContainer(cube, "random");
+...
 
-// Remove "random" coordinates from the grid and cleanup
-cubeCoordinates.RemoveCubes(cubeCoordinates.GetCubesFromContainer("random"));
-cubeCoordinates.CleanEmptyCoordinateContainers();
+Coordinates coordinates = Coordinates.Instance;
+coordinates.SetCoordinateType(Coordinate.Type.GenerateMesh);
 
-//Find and display a path between two coordinates
-List<Vector3> allCubeCoordinates = cubeCoordinates.GetCubesFromContainer("all");
+List<Vector3> cubes = Cubes.GetNeighbors(Vector3.zero, 10);
+coordinates.CreateCoordinates(cubes);
 
-cubeCoordinates.AddCubesToContainer(
-    cubeCoordinates.GetPathBetweenTwoCubes(
-        allCubeCoordinates[0],
-        allCubeCoordinates[allCubeCoordinates.Count - 1],
-        "path"
-    )
-);
-
-cubeCoordinates.HideCoordinatesInContainer("all");
-cubeCoordinates.ShowCoordinatesInContainer("path");
+coordinates.Build();
 ```
+
+Please go to the [examples](examples) folder to see more complex usages.
 
 ---
 
-##### Developed by following this guide: **https://www.redblobgames.com/grids/hexagons/**
+#### Coordinates
+
+Used to create and manage `Coordinate` instances, it provides a default `Container` labelled `"all"` which is treated as the master list which all methods operate.
+
+```csharp
+Coordinates.Instance.SetCoordinateType(Coordinate.Type.Prefab, myGameObject);
+
+Coordinates.Instance.CreateCoordinates(
+    Coordinates.GetNeighbors(Vector3.zero, 10)
+);
+
+Coordinates.Instance.Build();
+
+List<Coordinate> diff = Coordinates.Instance.BooleanDifference(
+    Coordinates.Instance.GetNeighbors(Vector3.zero, 4);
+    Coordinates.Instance.GetNeighbors(Vector3.zero, 2);
+);
+
+List<Coordinate> path = Coordinates.Instance.GetPath(origin, destination);
+```
+
+#### Coordinate
+
+An individual `Coordinate` instance represents a tile on the grid, keeps track of it's own cube coordinate, transform positon and GameObject associated with it, and can be used in various methods to find other `Coordinate` instances.
+
+```csharp
+Coordinate coordinate = Coordinates.Instance.GetContainer().GetCoordinate(new Vector3(4,1,-5));
+myGameObject.transform.position = coordinate.position;
+coordinate.SetGameObject(myGameObject);
+```
+
+#### Container
+
+Any number of `Container` instances can be created (optional, except for the default `"all"`) in order to track your own lists of `Coordinate` instances to be retreived later for your own purposes.
+
+```csharp
+Container movement_range = Coordinates.Instance.GetContainer("movement_range");
+movement_range.AddCoordinates( new List<Coordinate>{coordinateA, coordinateB});
+
+foreach(Coordinate c in movement_range.GetAllCoordinates())
+    c.go.GetComponent<MyScript>().DoSomething();
+
+movement_range.RemoveAllCoordinates();
+```
+
+#### Cubes
+
+Collection of cube coordinate system methods for quickly calculating desired coordinate results. Primarily used by the `Coordinates` class, it returns coordinate results without guarantee they have been instantiated. Using `Cubes` directly is desireable for combining serveral operations together before retreiving the results from a `Container`.
+
+```csharp
+List<Vector3> attackShape = Cubes.BooleanCombine(
+    Cubes.GetRing(Vector3.zero, 4),
+    Cubes.GetDiagonalNeighbors(Vector3.zero, 3)
+);
+
+Vector3 activeCube = Cubes.ConvertWorldPositionToCube(myGameObject.transform.position);
+
+List<Vector3> attackShapeTransformed = new List<Vector3>();
+foreach(Vector3 cube in attackShape)
+    attack.Add(cube + activeCube);
+
+Container attack = Coordinates.Instances.GetContainer("attack");
+List<Coordinate> attachShapeCoordinates = attack.GetCoordinates(attackShapeTransformed);
+```
+
+#### MeshCreator
+
+Used to generate hexagonal meshes when using `Coordinate.Type.GenerateMesh` which is useful for debugging.
+
+---
+
+### Development
+
+This package is being developed as part of a hobby indie game (Tactical RPG, TBD). There are no immediate plans to add features, improve useability or support users of this library. `CubeCoordinates` is an implementation of:
+
+https://www.redblobgames.com/grids/hexagons/
