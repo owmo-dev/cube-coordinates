@@ -32,17 +32,21 @@ Please go to the [examples](examples) folder to see more complex usages.
 Used to create and manage `Coordinate` instances, it provides a default `Container` labelled `"all"` which is treated as the master list which all methods operate.
 
 ```csharp
-Coordinates.Instance.SetCoordinateType(Coordinate.Type.Prefab, myGameObject);
+Coordinates coordinates = Coordinates.Instance;
+coordinates.SetCoordinateType(Coordinate.Type.Prefab, myGameObject);
 
-Coordinates.Instance.CreateCoordinates(
-    Coordinates.GetNeighbors(Vector3.zero, 10)
+coordinates.CreateCoordinates(
+    Cubes.GetNeighbors(Vector3.zero, 10)
 );
+
+Coordinate origin = coordinates.GetContainer().GetCoordinate(Vector3.zero);
+Coordinate destination = coordinates.GetContainer().GetCoordinate(new Vector3(4,1,-5));
 
 Coordinates.Instance.Build();
 
-List<Coordinate> diff = Coordinates.Instance.BooleanDifference(
-    Coordinates.Instance.GetNeighbors(Vector3.zero, 4);
-    Coordinates.Instance.GetNeighbors(Vector3.zero, 2);
+List<Coordinate> diff = coordinates.BooleanDifference(
+    coordinates.GetNeighbors(origin, 4),
+    coordinates.GetNeighbors(origin, 2)
 );
 
 List<Coordinate> path = Coordinates.Instance.GetPath(origin, destination);
@@ -86,9 +90,9 @@ Vector3 activeCube = Cubes.ConvertWorldPositionToCube(myGameObject.transform.pos
 
 List<Vector3> attackShapeTransformed = new List<Vector3>();
 foreach(Vector3 cube in attackShape)
-    attack.Add(cube + activeCube);
+    attackShapeTransformed.Add(cube + activeCube);
 
-Container attack = Coordinates.Instances.GetContainer("attack");
+Container attack = Coordinates.Instance.GetContainer("attack");
 List<Coordinate> attachShapeCoordinates = attack.GetCoordinates(attackShapeTransformed);
 ```
 
