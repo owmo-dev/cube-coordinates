@@ -2,6 +2,9 @@ using UnityEngine;
 
 namespace CubeCoordinates
 {
+    /// <summary>
+    /// Individual representation of a cube coordinate in the system
+    /// </summary>
     public class Coordinate
     {
         public enum Type
@@ -53,12 +56,21 @@ namespace CubeCoordinates
             }
         }
 
+        /// <summary>
+        /// Sets the Coordinate cube coordinate and world position
+        /// </summary>
+        /// <param name="cube"></param>
+        /// <param name="position"></param>
         public Coordinate(Vector3 cube, Vector3 position)
         {
             _cube = cube;
             _position = position;
         }
 
+        /// <summary>
+        /// Sets the GameObject which is associated with the Coordinate
+        /// </summary>
+        /// <param name="gameObject"></param>
         public void SetGameObject(GameObject gameObject)
         {
             _go = gameObject;

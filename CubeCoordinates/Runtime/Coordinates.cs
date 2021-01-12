@@ -4,6 +4,9 @@ using UnityEngine;
 
 namespace CubeCoordinates
 {
+    /// <summary>
+    /// Manages Coordinate and Container instances, instantiation of GameObject tiles
+    /// </summary>
     public class Coordinates : MonoBehaviour
     {
         private static Coordinates _instance;
@@ -83,6 +86,9 @@ namespace CubeCoordinates
             _coordinateGroup = new GameObject("(Group) Coordinates");
         }
 
+        /// <summary>
+        /// Uses global radius and scale to calculate coordinate spacing
+        /// </summary>
         private void CalculateDimensions()
         {
             _radius = _radius * _scale;
@@ -90,6 +96,9 @@ namespace CubeCoordinates
             _spacingZ = ((Mathf.Sqrt(3) / 2.0f) * (_radius * 2) / 2);
         }
 
+        /// <summary>
+        /// Destroys all Coordinate, Container and GameObject instances created by Coordinates
+        /// </summary>
         public void Clear()
         {
             _containers.Clear();
@@ -97,6 +106,11 @@ namespace CubeCoordinates
             _coordinateGroup = new GameObject("(Group) Coordinates");
         }
 
+        /// <summary>
+        /// Sets the desired instantiation type and GameObject for the Build method
+        /// </summary>
+        /// <param name="type">Coordinate.Type enum (None, Prefab, GenerateMesh)</param>
+        /// <param name="gameObject">Prefab GameObject to Instatiate at the Coordinate world position</param>
         public void SetCoordinateType(
             Coordinate.Type type,
             GameObject gameObject = null
@@ -121,6 +135,10 @@ namespace CubeCoordinates
             }
         }
 
+        /// <summary>
+        /// Creates Coordinate instances from a list of valid cube coordinates
+        /// </summary>
+        /// <param name="cubes">List of Vector3 cube coordinates</param>
         public void CreateCoordinates(List<Vector3> cubes)
         {
             Container container = GetContainer();
@@ -138,6 +156,9 @@ namespace CubeCoordinates
             container.AddCoordinates (coordinates);
         }
 
+        /// <summary>
+        /// Instantiates the GameObject specified in SetCoordinateType for all Coordinate instances in the "all" Container
+        /// </summary>
         public void Build()
         {
             if (_coordinateType == Coordinate.Type.None) return;
@@ -165,6 +186,11 @@ namespace CubeCoordinates
             }
         }
 
+        /// <summary>
+        /// Returns a Container for the provided key (will create if not found)
+        /// </summary>
+        /// <param name="key">String used to identify the Container, defaults to "all"</param>
+        /// <returns>Container with label matching key</returns>
         public Container GetContainer(string key = "all")
         {
             Container container;
@@ -176,12 +202,24 @@ namespace CubeCoordinates
             return container;
         }
 
+        /// <summary>
+        /// Creates a new Container instance, used by GetContainer internally
+        /// /// </summary>
+        /// <param name="key">String used to identify the Container</param>
         private void CreateContainer(string key)
         {
             if (!_containers.ContainsKey(key))
                 _containers.Add(key, new Container(key));
         }
 
+        /// <summary>
+        /// Gets a Coordinate instance adjacent to the origin Coordinate at a given distance and direction
+        /// </summary>
+        /// <param name="origin">Coordinate</param>
+        /// <param name="direction">Direction to get (0 to 5 valid)</param>
+        /// <param name="distance">Distance from origin (>=1 valid)</param>
+        /// <param name="container_label">Container to get results from, defaults to "all"</param>
+        /// <returns>Coordinate instance if found, otherwise null</returns>
         public Coordinate
         GetNeighbor(
             Coordinate origin,
@@ -195,6 +233,13 @@ namespace CubeCoordinates
                     .GetNeighbor(origin.cube, direction, distance));
         }
 
+        /// <summary>
+        /// Gets a List of Coordinate instances adjacent to the origin, for the specified number of steps
+        /// </summary>
+        /// <param name="origin">Coordinate</param>
+        /// <param name="steps">Number of iterations outwards to get (>=1 is valid)</param>
+        /// <param name="container_label">Container to get results from, defaults to "all"</param>
+        /// <returns>List of Coordinate instances found</returns>
         public List<Coordinate>
         GetNeighbors(
             Coordinate origin,
@@ -206,6 +251,14 @@ namespace CubeCoordinates
                 .GetCoordinates(Cubes.GetNeighbors(origin.cube, steps));
         }
 
+        /// <summary>
+        /// Gets a Coordinate instance diagonally adjacent to the Origin at a given distance and direction
+        /// </summary>
+        /// <param name="origin">Coordinate</param>
+        /// <param name="direction">Direction to get (0 to 5 valid)</param>
+        /// <param name="distance">Distance from origin (>=1 valid)</param>
+        /// <param name="container_label">Container to get results from, defaults to "all"</param>
+        /// <returns>Coordinate instance if found, otherwise null</returns>
         public Coordinate
         GetDiagonalNeighbor(
             Coordinate origin,
@@ -219,6 +272,13 @@ namespace CubeCoordinates
                     .GetDiagonalNeighbor(origin.cube, direction, distance));
         }
 
+        /// <summary>
+        /// Gets a List of Coordinate instances diagonally adjacent to the origin, for the specified number of steps
+        /// </summary>
+        /// <param name="origin">Coordinate</param>
+        /// <param name="distance">Distance from origin (>=1 valid)</param>
+        /// <param name="container_label">Container to get results from, defaults to "all"</param>
+        /// <returns>List of Coordinate instances found</returns>
         public List<Coordinate>
         GetDiagonalNeighbors(
             Coordinate origin,
@@ -237,6 +297,13 @@ namespace CubeCoordinates
             return results;
         }
 
+        /// <summary>
+        /// Gets a line of Coordinate instances from Coordinate a to Coordinate b, inclusive
+        /// </summary>
+        /// <param name="a">Coordinate start</param>
+        /// <param name="b">Coordinate end</param>
+        /// <param name="container_label">Container to get results from, defaults to "all"</param>
+        /// <returns>List of Coordinate instances found</returns>
         public List<Coordinate>
         GetLine(Coordinate a, Coordinate b, string container_label = "all")
         {
@@ -244,6 +311,14 @@ namespace CubeCoordinates
                 .GetCoordinates(Cubes.GetLine(a.cube, b.cube));
         }
 
+        /// <summary>
+        /// Gets a Coordinate on a line between Coordinate a to Coordinate b at a given distance
+        /// </summary>
+        /// <param name="a">Coordinate start</param>
+        /// <param name="b">Coordinate end</param>
+        /// <param name="distance">Distance from Coordinate a to get (>=1 valid)</param>
+        /// <param name="container_label">Container to get results from, defaults to "all"</param>
+        /// <returns>List of Coordinate instances found</returns>
         public Coordinate
         GetPointOnLne(
             Coordinate a,
@@ -256,6 +331,13 @@ namespace CubeCoordinates
                 .GetCoordinate(Cubes.GetPointOnLine(a.cube, b.cube, distance));
         }
 
+        /// <summary>
+        /// Gets a ring (hexagonal shape) of Coordinate instances at a specified distance from origin
+        /// </summary>
+        /// <param name="origin">Coordinate</param>
+        /// <param name="distance">Distance from origin (>=1 is valid)</param>
+        /// <param name="container_label">Container to get results from, defaults to "all"</param>
+        /// <returns>List of Coordinate instances found</returns>
         public List<Coordinate>
         GetRing(Coordinate origin, int distance, string container_label = "all")
         {
@@ -263,6 +345,13 @@ namespace CubeCoordinates
                 .GetCoordinates(Cubes.GetRing(origin.cube, distance));
         }
 
+        /// <summary>
+        /// Gets an ordered list of Coordinates in a clockwise spiral shape for a given number of concentric steps
+        /// </summary>
+        /// <param name="origin">Coordinate</param>
+        /// <param name="steps">Number of concentric steps (>=1 is valid)</param>
+        /// <param name="container_label">Container to get results from, defaults to "all"</param>
+        /// <returns>List of Coordinate instances found</returns>
         public List<Coordinate>
         GetSpiral(Coordinate origin, int steps, string container_label = "all")
         {
@@ -270,6 +359,13 @@ namespace CubeCoordinates
                 .GetCoordinates(Cubes.GetSpiral(origin.cube, steps));
         }
 
+        /// <summary>
+        /// Combines two Coordinate Lists into one, without duplicates
+        /// </summary>
+        /// <param name="a">Coordinate List a</param>
+        /// <param name="b">Coordinate List b</param>
+        /// <param name="container_label">Container to get results from, defaults to "all"</param>
+        /// <returns>List of Coordinate instances found</returns>
         public List<Coordinate>
         BooleanCombine(
             List<Coordinate> a,
@@ -283,6 +379,13 @@ namespace CubeCoordinates
                     b.Select(x => x.cube).ToList()));
         }
 
+        /// <summary>
+        /// Subtracts Coordinate instances from a if they are present in b
+        /// </summary>
+        /// <param name="a">Coordinate List a</param>
+        /// <param name="b">Coordinate List b</param>
+        /// <param name="container_label">Container to get results from, defaults to "all"</param>
+        /// <returns>List of Coordinate instances found</returns>
         public List<Coordinate>
         BooleanDifference(
             List<Coordinate> a,
@@ -296,6 +399,13 @@ namespace CubeCoordinates
                     b.Select(x => x.cube).ToList()));
         }
 
+        /// <summary>
+        /// Gets the Coordinate instances that are shared in both a and b
+        /// </summary>
+        /// <param name="a">Coordinate List a</param>
+        /// <param name="b">Coordinate List b</param>
+        /// <param name="container_label">Container to get results from, defaults to "all"</param>
+        /// <returns>List of Coordinate instances found</returns>
         public List<Coordinate>
         BooleanIntersect(
             List<Coordinate> a,
@@ -309,6 +419,13 @@ namespace CubeCoordinates
                     b.Select(x => x.cube).ToList()));
         }
 
+        /// <summary>
+        /// Gets the Coordinate instances that are mutually exclusive to a and b
+        /// </summary>
+        /// <param name="a">Coordinate List a</param>
+        /// <param name="b">Coordinate List b</param>
+        /// <param name="container_label">Container to get results from, defaults to "all"</param>
+        /// <returns>List of Coordinate instances found</returns>
         public List<Coordinate>
         BooleanExclude(
             List<Coordinate> a,
@@ -322,6 +439,13 @@ namespace CubeCoordinates
                     b.Select(x => x.cube).ToList()));
         }
 
+        /// <summary>
+        /// Gets the Coordinate instances that are "walkable" from the origin over a number of steps
+        /// </summary>
+        /// <param name="origin">Coordinate</param>
+        /// <param name="steps">Steps over which to walk to get results</param>
+        /// <param name="container_label">Container to get results from, defaults to "all"</param>
+        /// <returns>List of Coordinate instances found</returns>
         public List<Coordinate>
         GetExpand(Coordinate origin, int steps, string container_label = "all")
         {
@@ -364,6 +488,13 @@ namespace CubeCoordinates
             return results;
         }
 
+        /// <summary>
+        /// Gets an A* path between two Coordinate instances (must be connected)
+        /// </summary>
+        /// <param name="origin">Coordinate start</param>
+        /// <param name="target">Coordinate end</param>
+        /// <param name="container_label">Container to get results from, defaults to "all"</param>
+        /// <returns>List of Coordinate instances found</returns>
         public List<Coordinate>
         GetPath(
             Coordinate origin,
