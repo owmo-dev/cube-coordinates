@@ -52,9 +52,9 @@ namespace CubeCoordinates
             return coordinate;
         }
 
-        public Coordinate GetCoordinateFromWorldPosition(Vector3 position, float radius)
+        public Coordinate GetCoordinateFromWorldPosition(Vector3 position)
         {
-            Vector3 cube = Cubes.ConvertWorldPositionToCube(position, radius);
+            Vector3 cube = Cubes.ConvertWorldPositionToCube(position);
             return GetCoordinate(cube);
         }
 
