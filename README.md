@@ -23,7 +23,7 @@ coordinates.CreateCoordinates(cubes);
 coordinates.Build();
 ```
 
-Please check the [examples](examples) folder and [documentation](documentation/index.html) to learn more.
+Please check the [examples](examples) folder and [documentation zip](documentation/documentation.zip) to learn more.
 
 ---
 
