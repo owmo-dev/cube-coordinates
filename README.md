@@ -23,9 +23,11 @@ coordinates.CreateCoordinates(cubes);
 coordinates.Build();
 ```
 
-Please go to the [examples](examples) folder to see more complex usages.
+Please check the [examples](examples) and [documentation](documentation) folders to learn more.
 
 ---
+
+## Quick Introduction
 
 #### Coordinates
 
