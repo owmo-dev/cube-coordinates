@@ -109,6 +109,6 @@ Used to generate hexagonal meshes when using `Coordinate.Type.GenerateMesh` whic
 
 ### Development
 
-This package is being developed as part of a hobby indie game - TBD Tactical RPG - and there are no plans for a development roadmap or gaurantee of non-breaking changes between versions. I welcome any bug reports or suggestions, but please consider this as a resource for learning and if you intend to use it, make a fork so you can maintain a stable copy or extend it however you wish. This `CubeCoordinates` library is an implementation of the following:
+This package is being developed as part of a hobby indie game - TBD Tactical RPG - and there are no plans for a development roadmap or gaurantee of non-breaking changes between versions. I welcome any bug reports or suggestions, but please consider this as a resource for learning and if you intend to use it, make a fork so you can maintain a stable copy or extend it however you wish. `CubeCoordinates` is an implementation of the following:
 
 https://www.redblobgames.com/grids/hexagons/
