@@ -1,11 +1,11 @@
-# unity-package-library-CubeCoordinates
+# CubeCoordinates
 
 Unity package providing a cube coordinate system and methods for building hexagonal tile grids for interactive gameplay.
 
 | ![Build a grid of cube coordinates](images/grid_build.jpg) | ![A* Path Tracing](images/grid_path.jpg) | ![Expand to connected coordinates](images/grid_expand.jpg) |
 | ---------------------------------------------------------- | ---------------------------------------- | ---------------------------------------------------------- |
 
-## CubeCoordinates
+## Install
 
 To install, copy the `CubeCoordinates` Unity Package directory into your project's `Packages` directory.
 
@@ -27,7 +27,7 @@ Please check the [examples](examples) folder and [documentation zip](documentati
 
 ---
 
-## Quick Introduction
+## How to Use
 
 #### Coordinates
 
@@ -107,8 +107,8 @@ Used to generate hexagonal meshes when using `Coordinate.Type.GenerateMesh` whic
 
 ---
 
-### Development
+### Credit
 
-This package is being developed as part of a hobby indie game - TBD Tactical RPG - and there are no plans for a development roadmap or gaurantee of non-breaking changes between versions. I welcome any bug reports or suggestions, but please consider this as a resource for learning and if you intend to use it, make a fork so you can maintain a stable copy or extend it however you wish. `CubeCoordinates` is an implementation of the following:
+This package was developed by largely following the explanations found on this post:
 
 https://www.redblobgames.com/grids/hexagons/
