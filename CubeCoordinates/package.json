@@ -1,5 +1,5 @@
 {
-  "name": "com.grantmoore3d.cubecoordinates",
+  "name": "com.ctrlshiftmake.cubecoordinates",
   "version": "1.0.0",
   "displayName": "Cube Coordinates",
   "description": "Unity package providing a cube coordinate system and methods for building hexagonal tile grids for interactive gameplay.",
@@ -12,9 +12,9 @@
     "coordinates"
   ],
   "author": {
-    "name": "Grant Moore",
-    "email": "grantmoore3d@gmail.com",
-    "url": "https://www.grantmoore3d.com"
+    "name": "CtrlShiftMake Design",
+    "email": "ctrlshiftmake@gmail.com",
+    "url": "https://www.ctrlshiftmake.com"
   },
   "type": "library",
   "dependencies": {}
